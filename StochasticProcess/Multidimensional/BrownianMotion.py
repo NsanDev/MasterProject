@@ -20,14 +20,14 @@ class BrownianMotion(object):
         self.Dimension = len(self.Covariance[0])
         self.Mean = zeros(self.Dimension) if mean == None else mean
         
-    def Path(self, timeline, nbSimulation):
+    def Path(self, timeline, nb_simulation):
         '''
         Create nbSimulation path of the brownian motion evaluated at timeline
         '''
-        result = multivariate_normal(self.Mean,self.Covariance,(nbSimulation,len(timeline)))
+        result = multivariate_normal(self.Mean, self.Covariance, (nb_simulation, len(timeline)))
         result[:,0,:] *= timeline[0]
-        for k in range(1,len(timeline)):
-            result[:,k,:] = (timeline[k]-timeline[k-1])*result[:,k,:] + result[:,k-1,:]
+        for k in range(1, len(timeline)):
+            result[:, k, :] = (timeline[k]-timeline[k-1])*result[:, k, :] + result[:, k-1, :]
         return result
             
             
