@@ -3,17 +3,13 @@ Created on 2 avr. 2017
 
 @author: Naitra
 '''
-from scipy.spatial.distance import correlation
 
-from StochasticProcess.Multidimensional.BrownianMotion import BrownianMotion
-from StochasticProcess.GeometricBrownianMotion import GeometricBrownianMotion as GBM
 from Maths.ClosedForm.BlackScholes import Call
-from math import exp, sqrt, floor
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 from numpy.random import multivariate_normal
-from Scripts.CreditModel.Tools import RiskStatistics
+from Scripts.CreditModel.Tools.RiskStatistics import riskStatistics
 
 if __name__ == '__main__':
     pass
@@ -58,32 +54,32 @@ def Path(timeline, nb_simulation):
     return result
 
 Paths = Path(timeline=timeline, nb_simulation=Nsimulations)
-gbm = Paths[:, :, 0]
-gbm = F0 * np.array([exp( (r-0.5*sigma**2)*timeline[t] + sigma*Paths[:, t] for t in range(0,Ntimes))])
 
-priceCall = lambda s,t: Call(s,r,sigma,K,T-t)
-Exposures = np.array([ [priceCall(pathtime_k,timeline[k]) for pathtime_k in gbm[:,k] ]  for k in range(0,Ntimes) ] )
+gbm = [ (r-0.5*sigma**2)*timeline[t] + sigma*Paths[:, t, 0] for t in range(0, Ntimes)]
+gbm = np.transpose(F0*np.exp(gbm))
+
+priceCall = lambda s, t: Call(s, r, sigma, K, T-t)
+Exposures = np.transpose([ [priceCall(pathtime_k, timeline[t]) for pathtime_k in gbm[:, t] ] for t in range(0, Ntimes) ])
 
 constant_prob_def = 0.01 # calibrated from cds
-prob_def = [ constant_prob_def for k in range(0, Ntimes) ]
+prob_def = [constant_prob_def for k in range(0, Ntimes) ]
 norminv = norm.ppf
 C = [norminv(prob_def[k]) for k in range(0, Ntimes)]
 Z = norm.cdf(Exposures)# market factor
-denom = sqrt(1-rho*rho)
-weights = [norm.cdf((C[t]-rho*Z[:, t])/denom) for t in range(0, Ntimes)]
-weights = np.array([weights[:, t]/sum(weights[:, t]) for t in range(0, Ntimes)])
+denom = np.sqrt(1-rho*rho)
+weights = np.transpose([norm.cdf((C[t]-rho*Z[:, t])/denom) for t in range(0, Ntimes)])
+#weights = np.array([weights[:, t]/sum(weights[:, t]) for t in range(0, Ntimes)])
 
 ###################
 ### Compute stats
 ###################
 weighted_exposures = np.multiply(weights, Exposures)
+alpha = 0.05
 
-EE = np.zeros(Ntimes)
-PFE = np.zeros(Ntimes)
-ES = np.zeros(Ntimes)
-#[(EE[t],PFE[t],ES[t]) = RiskStatistics.riskStatistics(Exposures[:, t],weights[:, t],alpha) for t in range(0,T)]
+resultsIndep = [riskStatistics(Exposures[:, t], alpha) for t in range(0, Ntimes)]
+resultsWWR = [riskStatistics(Exposures[:, t], weights[:, t], alpha) for t in range(0, Ntimes)]
 
-plt.plot(timeline,Exposures)
+plt.plot(timeline, Exposures)
 plt.xlabel('time')
 plt.ylabel('value')
 plt.title('Exposure')
