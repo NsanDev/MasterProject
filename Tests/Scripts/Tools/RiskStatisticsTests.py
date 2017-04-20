@@ -11,8 +11,8 @@ class TestStringMethods(unittest.TestCase):
         W = W / 100
         results1 = risk_statistics(A, W, 0.1)
         results2 = risk_statistics(A, alpha=0.1)
-        self.assertEqual(results1, [50.5, 90, 95])
-        self.assertEqual(results2, [50.5, 90, 95])
+        self.assertEqual(results1, [50.5, 10, 90, 95])
+        self.assertEqual(results2, [50.5, 10, 90, 95])
 
 if __name__ == '__main__':
     unittest.main()

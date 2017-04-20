@@ -23,15 +23,15 @@ class GeometricBrownianMotion(object):
         '''
         Create Phi path of the GBM evaluated at the values in timeline
         '''
-        dsigmas = 1.0/2*power(self.Vol, 2)
+        dsigmas = 0.5*self.Vol**2
         adjused_drift = (self.Drift-dsigmas)
         T = len(timeline)
         L = zeros([nb_path, T])
         W = array(randn((nb_path, T - 1)))
         L[:, 0] = log(self.InitialValue)  # broadcasting
-        for j in range(1,T):
-            delta = timeline[j]-timeline[j-1]
-            L[:, j] = L[:, j-1] + adjused_drift*delta + self.Vol*sqrt(delta)*W[:, j-1]
+        for t in range(1,T):
+            delta = timeline[t]-timeline[t-1]
+            L[:, t] = L[:, t-1] + adjused_drift*delta + self.Vol*sqrt(delta)*W[:, t-1]
         return exp(L)
         
     
