@@ -28,7 +28,7 @@ def Call(S0,r,sigma,K,T,div=0):
         return S0*exp(-div*T)*norm.cdf(d1)-K*exp(-r*T)*norm.cdf(d2)
 
 def Put(S0,r,sigma,K,T,div=0):
-    return S0*exp(-div*T) - K*exp(-r*T) - Call(S0,r,sigma,K,T,div)
+    return -S0*exp(-div*T) + K*exp(-r*T) + Call(S0,r,sigma,K,T,div)
 
 
 def Call_Delta(S0,r,sigma,K,T,div=0):
