@@ -90,7 +90,10 @@ start = time.time()
 Exposures = [list(cumulated_price(simulated_paths[t,:], timeline[t])) for t in index_exposure]
 end = time.time()
 deltaT2 = end-start
-
+start = time.time()
+Exposures3 = cumulated_price(simulated_paths, timeline)
+end = time.time()
+deltaT3 = end-start
 
 constant_prob_def = 0.001 # have to be calibrated from cds
 prob_def = [constant_prob_def for k in range(0, nb_exposure)]
