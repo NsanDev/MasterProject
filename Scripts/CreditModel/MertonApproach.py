@@ -15,6 +15,7 @@ from Scripts.CreditModel.Tools.RiskStatistics import risk_statistics
 from statsmodels.distributions.empirical_distribution import ECDF
 from StochasticProcess.GeometricBrownianMotion import GeometricBrownianMotion
 from StochasticProcess.Commodities.Schwartz97 import Schwartz97
+import time
 if __name__ == '__main__':
     pass
 
@@ -61,10 +62,12 @@ Nsimulations = 100
 
 # market sensitivities
 gbm = GeometricBrownianMotion(F0, mu, sigma)
-# simulated_paths = gbm.Path(timeline=timeline, nb_path=Nsimulations)
+simulated_paths = gbm.Path(timeline=timeline, nb_path=Nsimulations)
+simulated_paths = transpose(simulated_paths,(1,0))
 
-model = Schwartz97(S0=S0,delta0=delta0,mu=mu,sigma_s=sigma_s,kappa=kappa,alpha=alpha,sigma_e=sigma_e,rho=rho)
-simulated_paths = model.Path(timeline,nb_path=Nsimulations,spot_only=True)
+#model = Schwartz97(S0=S0,delta0=delta0,mu=mu,sigma_s=sigma_s,kappa=kappa,alpha=alpha,sigma_e=sigma_e,rho=rho)
+#simulated_paths = model.Path(timeline,nb_path=Nsimulations,spot_only=True)
+
 ###################
 ### Exposure
 ###################
@@ -77,10 +80,20 @@ price_put = lambda s, t: Put(s, r, sigma, K, T-t)
 price_spot = lambda s, t: s
 #portfolio = [price_call, price_put]
 portfolio = [price_spot]
-cumulated_price = lambda s, t: sum([x(s,t) for x in portfolio])
+cumulated_price = lambda s, t: sum([vectorize(instrument)(s, t) for instrument in portfolio], axis=0)
 
-Exposures = [[cumulated_price(pathtime_k, timeline[t]) for pathtime_k in simulated_paths[:, t]] for t in index_exposure]
-
+start = time.time()
+Exposures1 = [[cumulated_price(pathtime_k, timeline[t]) for pathtime_k in simulated_paths[t,:]] for t in index_exposure]
+end = time.time()
+deltaT = end-start
+start = time.time()
+Exposures = [list(cumulated_price(simulated_paths[t,:], timeline[t])) for t in index_exposure]
+end = time.time()
+deltaT2 = end-start
+start = time.time()
+Exposures3 = cumulated_price(simulated_paths, timeline)
+end = time.time()
+deltaT3 = end-start
 
 constant_prob_def = 0.001 # have to be calibrated from cds
 prob_def = [constant_prob_def for k in range(0, nb_exposure)]
