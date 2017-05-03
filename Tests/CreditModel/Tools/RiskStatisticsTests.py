@@ -1,11 +1,14 @@
-from Scripts.CreditModel.Tools.RiskStatistics import risk_statistics
-from numpy import ones
-
 import unittest
 
-class TestStringMethods(unittest.TestCase):
+from numpy import ones
+
+from CreditModel.Tools.RiskStatistics import risk_statistics
+
+
+class RiskStatisticsTests(unittest.TestCase):
 
     def test_risk_statistics(self):
+
         A = range(100,0,-1)
         W = ones(100)
         W = W / 100
