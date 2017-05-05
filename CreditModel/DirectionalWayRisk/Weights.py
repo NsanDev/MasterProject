@@ -71,9 +71,9 @@ def weights(hazard_rates, timeline, times_exposure):
     return result
 
 '''
-This calibrator can bu reused for specific + global way risk model
+This calibrator can be reused for specific + global way risk model
 b: defined in Hull 2012
-Z: Market factor (more generic than value of portfolio)
+Z: Market factor or transformation of Market factor (more generic than value of portfolio)
 probability_default: P(tau<t) for t in times_default
 times_default: times to define P(tau<t) as a piecewise flat function
 '''
