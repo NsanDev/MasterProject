@@ -9,8 +9,8 @@ X = N(mu,sigmasq)
 K is constant
 '''
 def Call(mu,sigmasq,K):
-    return exp(mu+0.5*sigmasq)*norm.cdf((mu+sigmasq)/sqrt(sigmasq)) - \
-           K*norm.cdf((mu)/sqrt(sigmasq))
+    return exp(mu+0.5*sigmasq)*norm.cdf((mu+sigmasq-log(K))/sqrt(sigmasq)) - \
+           K*norm.cdf((mu-log(K))/sqrt(sigmasq))
 
 def Put(mu,sigma,K):
     return exp(mu+0.5*sigma**2)- K - Call(mu,sigma,K)
