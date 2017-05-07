@@ -1,13 +1,14 @@
 import unittest
 
 from numpy import array, ones
-from CreditModel.Tools.RiskStatistics import risk_statistics
+
 from CreditModel.DirectionalWayRisk.Weights import _integrate_intensity
+from CreditModel.Tools.RiskStatistics import risk_statistics
+
 
 class testCreditModel(unittest.TestCase):
 
     def test_integral_intensity(self):
-
         h = array([2, 4, 6])
         times = array([10, 20, 30])
         integral_intensity = lambda t_up: _integrate_intensity(t_up, h_rates=h, timeline=times)
@@ -20,8 +21,7 @@ class testCreditModel(unittest.TestCase):
         self.assertEqual(integral_intensity(30), 10 * 2 + (20 - 10) * 4 + (30 - 20) * 6)
 
     def test_risk_statistics(self):
-
-        A = range(100,0,-1)
+        A = range(100, 0, -1)
         W = ones(100)
         W = W / 100
         results1 = risk_statistics(A, W, 0.1)
