@@ -7,9 +7,9 @@ import Maths.ClosedForm.BlackScholes as bls
 import Maths.ClosedForm.GenericFormulas as formulas
 
 
-class ClosedFormTests(unittest.TestCase):
+class testMaths(unittest.TestCase):
 
-    def BlackScholesTests(self):
+    def test_BlackScholes(self):
         S0 = 100
         r = 0.1
         div = 0.05
@@ -32,7 +32,7 @@ class ClosedFormTests(unittest.TestCase):
         self.assertAlmostEqual(bls.Call_Rho(S0=S0, sigma=sigma, r=r, K=K, T=T, div=div), 50.636302785153205,
                                delta=1E-10)
 
-    def GenericFormulaTests(self):
+    def test_GenericFormula(self):
         S0 = 100
         r = 0.1
         div = 0.05
@@ -45,28 +45,6 @@ class ClosedFormTests(unittest.TestCase):
         self.assertAlmostEqual(bls.Call(S0=S0, sigma=sigma, r=r, K=K, T=T, div=div)*exp(r*T),
                                formulas.Call(mu=mu, sigmasq=variance_tot, K=K),
                                delta=1E-10)
-
-
-    def test_MC(self):
-        '''
-        
-        S0 = 100
-        r = 0.1
-        div = 0.05
-        sigma = 0.2
-        K = 100
-        T = 1
-
-        nb_simulation = 10000000
-        X = multivariate_normal([0], [[1]], nb_simulation)
-        Xp = log(S0)+ (r-div-0.5*sigma**2)*T + sqrt(T)*sigma*X
-        Xm = log(S0)+ (r-div-0.5*sigma**2)*T - sqrt(T)*sigma*X
-        estimate_m = maximum(exp(Xm) - K, 0) * exp(-r * T)
-        estimate_p = maximum(exp(Xp) - K, 0) * exp(-r * T)
-        estimate = mean(estimate_m+estimate_p)*0.5
-        
-        :return: 
-        '''
 
 
 if __name__ == '__main__':

@@ -6,9 +6,7 @@ Created on 2 avr. 2017
 import time
 
 import matplotlib.pyplot as plt
-from numpy import transpose, sum, array, linspace, vectorize, random, maximum, zeros
-from scipy.stats import norm
-from statsmodels.distributions.empirical_distribution import ECDF
+from numpy import transpose, sum, array, linspace, vectorize, random, maximum
 from xlrd.formula import num2strg
 from numpy import exp
 from CreditModel.Tools.RiskStatistics import risk_statistics
@@ -90,7 +88,7 @@ portfolio = [price_spot,price_put,price_call]
 portfolio = [vectorize(instr) for instr in portfolio]
 cumulated_price = lambda s, t: sum([instrument(s, t) for instrument in portfolio], axis=0)
 nb_instrument = len(portfolio)
-range_portfolio = range(0,nb_instrument)
+range_portfolio = range(0, nb_instrument)
 V = [[instrument(simulated_paths[t,:], timeline[t]) for t in index_exposure] for instrument in portfolio ]
 #Vtot = [cumulated_price(simulated_paths[t,:], timeline[t]) for t in index_exposure]
 ###################
