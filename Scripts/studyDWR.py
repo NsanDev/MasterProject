@@ -3,17 +3,18 @@ Created on 2 avr. 2017
 
 @author: Naitra
 '''
-import time
 
 import matplotlib.pyplot as plt
+from numpy import exp
 from numpy import transpose, sum, array, linspace, vectorize, random, maximum
 from xlrd.formula import num2strg
-from numpy import exp
+
+from CreditModel.DirectionalWayRisk.Weights import Merton
 from CreditModel.Tools.RiskStatistics import risk_statistics
-from CreditModel.DirectionalWayRisk.Weights import merton,weights,calibration_hull
 from Maths.ClosedForm.BlackScholes import Call, Put
-from StochasticProcess.GeometricBrownianMotion import GeometricBrownianMotion
 from Maths.PiecewiseFlat import piecewise_flat
+from StochasticProcess.GeometricBrownianMotion import GeometricBrownianMotion
+
 if __name__ == '__main__':
     pass
 
@@ -116,16 +117,20 @@ PD = [piecewise_flat(t,probability_default_value,time_intensity) for t in time_e
 ### Compute weights
 ###################
 rho = 0.5
-weightsMerton = [[merton(Exposures[k][t],rho,PD[t],tolerance=0.001) for t in range_exposure] for k in range_portfolio]
+weightsMerton = [[Merton(Exposures[k][t], rho, PD[t], tolerance=0.001) for t in range_exposure] for k in
+                 range_portfolio]
 
 ###################
 ### Compute stats
 ###################
 
-alpha = 0.05
+confidence = 0.05
 
-resultsIndep = array([[risk_statistics(Exposures[k][t], alpha=alpha) for t in range_exposure] for k in range_portfolio])
-resultsDWR = array([[risk_statistics(Exposures[k][t], weights=weightsMerton[k][t], alpha=alpha) for t in range_exposure] for k in range_portfolio])
+resultsIndep = array(
+    [[risk_statistics(Exposures[k][t], alpha=confidence) for t in range_exposure] for k in range_portfolio])
+resultsDWR = array(
+    [[risk_statistics(Exposures[k][t], weights=weightsMerton[k][t], alpha=confidence) for t in range_exposure] for k in
+     range_portfolio])
 #resultsDWRtot = array([risk_statistics(Exposures[t], weights=weightsMerton[t], alpha=alpha) for t in range_exposure])
 # first dimension is time
 

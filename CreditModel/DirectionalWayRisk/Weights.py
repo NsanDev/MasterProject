@@ -1,13 +1,15 @@
-from numpy import  sum, sqrt, vectorize,  dot, exp, zeros, mean, log
-from scipy.stats import norm
-from statsmodels.distributions.empirical_distribution import ECDF
 from bisect import bisect_left
 
+from numpy import sum, sqrt, vectorize, dot, exp, zeros, mean, log
+from scipy.stats import norm
+from statsmodels.distributions.empirical_distribution import ECDF
 
 '''
 Compute weights from the Merton Model
 '''
-def merton(Z_M,rho,probability_default,tolerance=0.001):
+
+
+def Merton(Z_M, rho, probability_default, tolerance=0.001):
 
     C = norm.ppf(probability_default)
     # market factor
@@ -54,7 +56,9 @@ def _integrate_intensity(t, h_rates, timeline):
 '''
 Compute weights from simulated hazard rate. (for Hull and Ruiz approach)
 '''
-def weights(hazard_rates, timeline, times_exposure):
+
+
+def Weights(hazard_rates, timeline, times_exposure):
 
     assert (timeline[0]>0)
     assert (all(t in timeline for t in times_exposure))
@@ -77,7 +81,9 @@ Z: Market factor or transformation of Market factor (more generic than value of 
 probability_default: P(tau<t) for t in times_default
 times_default: times to define P(tau<t) as a piecewise flat function
 '''
-def calibration_hull( b,Z, timeline, probability_default, times_default):
+
+
+def Calibration_hull(b, Z, timeline, probability_default, times_default):
 
     assert (timeline[0]>0)
     assert (all(t in timeline for t in times_default))
@@ -90,7 +96,7 @@ def calibration_hull( b,Z, timeline, probability_default, times_default):
     cumulative_a = times_default[0]*a[0]
     for k in range(1, len(times_default)):
         a[k] = -log(mean(exp(- cumulative_a - _integrate_intensity(times_default[k], Z, timeline)))/probability_default[k]) /(times_default[k] - times_default[k - 1])
-        A = A + a[k] * (times_default[k] - times_default[k - 1])
+        cumulative_a = cumulative_a + a[k] * (times_default[k] - times_default[k - 1])
     # TODO test that
     return a
 
