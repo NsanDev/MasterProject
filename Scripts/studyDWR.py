@@ -51,7 +51,7 @@ start_default = 0.1
 start_path = 0.01
 range_exposure = range(0,nb_point_exposure)
 
-time_exposure = linspace(start_exposure, T, nb_point_exposure, endpoint=True) # not necessary the point we need to price
+time_exposure = linspace(start_exposure, T, nb_point_exposure, endpoint=True)  # times at which we want exposure
 time_intensity = linspace(start_exposure, T, nb_point_intensity, endpoint=True) # times where calibrated intensity breaks
 time_path = linspace(start_path, T, nb_point_path, endpoint=True)
 

@@ -1,7 +1,10 @@
-from numpy import array, zeros, exp, log, sqrt, maximum, less_equal
-from numpy.random import multivariate_normal
 from bisect import bisect_left
+
+from numpy import zeros, exp, log, sqrt, maximum, less_equal
+from numpy.random import multivariate_normal
+
 from Maths.ClosedForm.GenericFormulas import Call as generic_call
+from Maths.ClosedForm.GenericFormulas import Put as generic_put
 
 '''
 Documentation in:
@@ -131,6 +134,19 @@ class Schwartz97:
             sigmasq = self._sigmasq_F(maturity_option - t, delivery_time_forward)
             mu = log(mu) - 0.5 * sigmasq
             return generic_call(mu, sigmasq, K) * exp(-self.r * (maturity_option - t))
+
+    def put(self, t, maturity_option, delivery_time_forward, K, S_ini, delta_ini):
+        assert t <= maturity_option
+        assert maturity_option <= delivery_time_forward
+
+        mu = self.forward(t, delivery_time_forward, S_ini, delta_ini)
+        if t == maturity_option:  # it mean t = maturity_option and there is not stochasticity and no discount factor
+            return maximum(K - mu, 0)
+        else:
+            sigmasq = self._sigmasq_F(maturity_option - t, delivery_time_forward)
+            mu = log(mu) - 0.5 * sigmasq
+            return generic_put(mu, sigmasq, K) * exp(-self.r * (maturity_option - t))
+
 
     def swap(self, t, exchange_time, maturities, S_ini, delta_ini):
 

@@ -1,7 +1,6 @@
 import unittest
 
-from numpy import log, sqrt, exp, maximum, mean
-from numpy.random import multivariate_normal, seed
+from numpy import log, exp
 
 import Maths.ClosedForm.BlackScholes as bls
 import Maths.ClosedForm.GenericFormulas as formulas
@@ -44,6 +43,9 @@ class testMaths(unittest.TestCase):
         variance_tot = (sigma**2)*T
         self.assertAlmostEqual(bls.Call(S0=S0, sigma=sigma, r=r, K=K, T=T, div=div)*exp(r*T),
                                formulas.Call(mu=mu, sigmasq=variance_tot, K=K),
+                               delta=1E-10)
+        self.assertAlmostEqual(bls.Put(S0=S0, sigma=sigma, r=r, K=K, T=T, div=div) * exp(r * T),
+                               formulas.Put(mu=mu, sigmasq=variance_tot, K=K),
                                delta=1E-10)
 
 
