@@ -4,16 +4,15 @@ Created on 21 mars 2017
 @author: Naitra
 '''
 import unittest
-import numpy as np
 
+from numpy import linspace
 from numpy import random, array_equal, mean
 from scipy.stats import norm
-from StochasticProcess.GeometricBrownianMotion import GeometricBrownianMotion as GBM
-from StochasticProcess.Multidimensional import BrownianMotion
-from StochasticProcess.Commodities.Schwartz97 import *
+
 from Maths.ClosedForm.BlackScholes import Call
-from numpy import linspace
-from matplotlib import pyplot
+from StochasticProcess.Commodities.Schwartz97 import *
+from StochasticProcess.GeometricBrownianMotion import GeometricBrownianMotion as GBM
+
 
 class testStochasticProcess(unittest.TestCase):
 
@@ -121,7 +120,7 @@ class testStochasticProcess(unittest.TestCase):
 
 
         ########################################
-        ### Call
+        ### Call and Put
         ########################################
 
         t, T, K, TM = 0, 0.75, 30, 1.6
@@ -133,6 +132,11 @@ class testStochasticProcess(unittest.TestCase):
         actual_value = exp(-r*(T-t))*(G*norm.cdf(dp)-K*norm.cdf(dm))
         calculated_call = model.call(t=t, maturity_option=T, delivery_time_forward=TM, K=K, S_ini=S0, delta_ini=delta0)
         self.assertAlmostEqual(actual_value, calculated_call, delta=1E-10)
+
+        calculated_put = model.put(t=t, maturity_option=T, delivery_time_forward=TM, K=K, S_ini=S0, delta_ini=delta0)
+
+        self.assertAlmostEqual(calculated_call - calculated_put,
+                               exp(-r * (T - t)) * (model.forward(t, TM, S0, delta0) - K))
 
         ### MC valuation ###
         random.seed(600)

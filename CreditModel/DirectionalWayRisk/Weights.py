@@ -10,6 +10,8 @@ Compute weights from the Merton Model
 
 
 def Merton(Z_M, rho, probability_default, tolerance=0.001):
+    assert 0 < probability_default < 1
+    assert -1 <= rho <= 1
 
     C = norm.ppf(probability_default)
     # market factor
@@ -49,15 +51,15 @@ def _integrate_intensity(t, h_rates, timeline):
     else:
         result = h_rates[0,] * timeline[0]
         if max_index > 1:
-            result = result + dot(timeline[1:max_index] - timeline[0:max_index - 1], h_rates[1:max_index, ])
+            CCC = dot(timeline[1:max_index] - timeline[0:max_index - 1], h_rates[1:max_index, ])
+            result = result + CCC
         result = result + (t - timeline[max_index - 1]) * h_rates[max_index,]
         return result
 
 '''
 Compute weights from simulated hazard rate. (for Hull and Ruiz approach)
+timeline correspond to all the times at which we have hazard rates
 '''
-
-
 def Weights(hazard_rates, timeline, times_exposure):
 
     assert (timeline[0]>0)
@@ -67,35 +69,35 @@ def Weights(hazard_rates, timeline, times_exposure):
 
     result = [-_integrate_intensity(t, hazard_rates, timeline) for t in times_exposure]
     result = exp(result)
-    for t in range(len(timeline),0,-1):
+    for t in range(len(times_exposure) - 1, 0, -1):
         result[t] = result[t-1] - result[t]
         result[t] = result[t]/sum(result[t])  # normalization
-    result[0] = result[0]/sum(result[0])
-    #TODO check that weights are smaller than 1 and add up to 1
+    result[0] = 1 - result[0]
+    result[0] = result[0] / sum(result[0])
     return result
 
 '''
 This calibrator can be reused for specific + global way risk model
 b: defined in Hull 2012
 Z: Market factor or transformation of Market factor (more generic than value of portfolio)
-probability_default: P(tau<t) for t in times_default
+probability_default: P(tau<t) for t in times_default. should be calibrated from cds
 times_default: times to define P(tau<t) as a piecewise flat function
 '''
-
-
 def Calibration_hull(b, Z, timeline, probability_default, times_default):
 
     assert (timeline[0]>0)
     assert (all(t in timeline for t in times_default))
     assert (all(timeline[i] < timeline[i + 1] for i in range(0, len(timeline) - 1)))
-    assert (Z.shape[0] == len(timeline))
+    assert (len(Z) == len(timeline))
 
     a = zeros(len(times_default))
-    a[0] = -log(mean(exp(-_integrate_intensity(times_default[0], Z,timeline)))/
-               probability_default[0])/times_default[0]
+    a[0] = log(mean(exp(-b * _integrate_intensity(times_default[0], Z, timeline))) /
+               (1 - probability_default[0])) / times_default[0]
     cumulative_a = times_default[0]*a[0]
     for k in range(1, len(times_default)):
-        a[k] = -log(mean(exp(- cumulative_a - _integrate_intensity(times_default[k], Z, timeline)))/probability_default[k]) /(times_default[k] - times_default[k - 1])
+        a[k] = (- cumulative_a + log(mean(exp(-b * _integrate_intensity(times_default[k], Z, timeline)))
+                                     / (1 - probability_default[k]))) \
+               / (times_default[k] - times_default[k - 1])
         cumulative_a = cumulative_a + a[k] * (times_default[k] - times_default[k - 1])
     # TODO test that
     return a
