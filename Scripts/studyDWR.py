@@ -31,7 +31,7 @@ F0 = 45
 
 # parameters schwartz
 S0 = F0
-delta0 = 0.1
+delta0 = 0.15
 mu = 0.142
 sigma_s = 0.393
 kappa = 1.876
