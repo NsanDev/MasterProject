@@ -43,8 +43,7 @@ class testStochasticProcess(unittest.TestCase):
         sigma_e = 0.527
         rho = 0.766
 
-        model = Schwartz97(S0=S0, delta0=delta0, r=r, sigma_s=sigma_s, kappa=kappa, alpha_tilde=alpha, sigma_e=sigma_e,
-                           rho=rho)
+        model = Schwartz97(r=r, sigma_s=sigma_s, kappa=kappa, alpha_tilde=alpha, sigma_e=sigma_e, rho=rho)
 
 
         ########################################
@@ -141,7 +140,7 @@ class testStochasticProcess(unittest.TestCase):
         ### MC valuation ###
         random.seed(600)
         timeline = linspace(0.01, T - t, num=20, endpoint=True)
-        pathQ = model.PathQ(timeline=timeline, nb_path=100000)
+        pathQ = model.PathQ(S_ini=S0, delta_ini=delta0, timeline=timeline, nb_path=100000)
         ForwardtT = pathQ[:, -1, 0]*exp(model.A(TM-T) + model.B(TM-T)*pathQ[:, -1, 1])
         estimate_call = maximum(ForwardtT-K, 0) * exp(-r*(T-t))
         self.assertAlmostEqual(actual_value, mean(estimate_call), delta=1E-2)
@@ -152,11 +151,11 @@ class testStochasticProcess(unittest.TestCase):
         ########################################
 
         random.seed(600)
-        pathPQ = model.PathPQ(r, alpha, timeline=timeline, nb_path=10)
+        pathPQ = model.PathPQ(r, alpha, S_ini=S0, delta_ini=delta0, timeline=timeline, nb_path=10)
         random.seed(600)
-        pathQ = model.PathQ(timeline=timeline, nb_path=10)
+        pathQ = model.PathQ(S_ini=S0, delta_ini=delta0, timeline=timeline, nb_path=10)
         random.seed(600)
-        pathP = model.PathP(r, alpha, timeline=timeline, nb_path=10)
+        pathP = model.PathP(r, alpha, S_ini=S0, delta_ini=delta0, timeline=timeline, nb_path=10)
 
         assert array_equal(pathPQ[0], pathPQ[1]) # test if pathP and pathQ gives the same results
         assert array_equal(pathPQ[0], pathP)

@@ -110,6 +110,5 @@ class testCreditModel(unittest.TestCase):
         self.assertAlmostEqual(mean(p1), probability_default[1], delta=1E-10)
         self.assertAlmostEqual(mean(p2), probability_default[2], delta=1E-10)
 
-
 if __name__ == '__main__':
     unittest.main()

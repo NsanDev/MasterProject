@@ -76,6 +76,27 @@ def Weights(hazard_rates, timeline, times_exposure):
     result[0] = result[0] / sum(result[0])
     return result
 
+
+'''
+Compute probabilities of default P(t_(i-1)<tau<t_i) from  hazard rate.
+timeline correspond to all the times at which we have hazard rates
+times_exposure are the t_i's
+'''
+
+
+def Probabilities_CVA(hazard_rates, timeline, times_exposure):
+    assert (timeline[0] > 0)
+    assert (all(t in timeline for t in times_exposure))
+    assert (all(timeline[i] < timeline[i + 1] for i in range(0, len(timeline) - 1)))
+    assert (hazard_rates.shape[0] == len(timeline))
+
+    result = [-_integrate_intensity(t, hazard_rates, timeline) for t in times_exposure]
+    result = exp(result)
+    for t in range(len(times_exposure) - 1, 0, -1):
+        result[t] = result[t - 1] - result[t]
+    result[0] = 1 - result[0]
+    return result
+
 '''
 This calibrator can be reused for specific + global way risk model
 b: defined in Hull 2012

@@ -16,9 +16,7 @@ Contains functions for pricing under Schwartz97
 '''
 
 class Schwartz97:
-    def __init__(self, S0, delta0, r, sigma_s, kappa, alpha_tilde, sigma_e, rho):
-        self.S0 = S0
-        self.delta0 = delta0
+    def __init__(self, r, sigma_s, kappa, alpha_tilde, sigma_e, rho):
         self.r = r
         self.sigma_s = sigma_s
         self.kappa = kappa
@@ -30,15 +28,15 @@ class Schwartz97:
     ### Path Generator
     ##############################################
 
-    def _Path(self, mu, alpha, timeline, nb_path, W):
+    def _Path(self, mu, alpha, S_ini, delta_ini, timeline, nb_path, W):
         dsigmas = 0.5 * self.sigma_s ** 2
         adjused_drift = (mu - dsigmas)
         T = len(timeline)
         L = zeros([nb_path, T, 2])
 
-        L[:, 0, 0] = log(self.S0) + (adjused_drift - self.delta0) * timeline[0] \
+        L[:, 0, 0] = log(S_ini) + (adjused_drift - delta_ini) * timeline[0] \
                      + self.sigma_s * sqrt(timeline[0]) * W[:, 0, 0]
-        L[:, 0, 1] = self.delta0 + self.kappa * (alpha - self.delta0) * timeline[0] \
+        L[:, 0, 1] = delta_ini + self.kappa * (alpha - delta_ini) * timeline[0] \
                      + self.sigma_e * sqrt(timeline[0]) * W[:, 0, 1]
 
         for t in range(1, T):
@@ -51,21 +49,22 @@ class Schwartz97:
         L[:, :, 0] = exp(L[:, :, 0])
         return L
 
-    def PathP(self, mu, alpha, timeline, nb_path):
+    def PathP(self, mu, alpha, S_ini, delta_ini, timeline, nb_path):
         W = multivariate_normal([0, 0], [[1, self.rho], [self.rho, 1]], (nb_path, len(timeline)))
-        return self._Path(mu, alpha, timeline, nb_path, W)
+        return self._Path(mu, alpha, S_ini, delta_ini, timeline, nb_path, W)
 
-    def PathQ(self, timeline, nb_path):
+    def PathQ(self, S_ini, delta_ini, timeline, nb_path):
         W = multivariate_normal([0, 0], [[1, self.rho], [self.rho, 1]], (nb_path, len(timeline)))
-        return self._Path(self.r, self.alpha_tilde, timeline, nb_path, W)
+        return self._Path(self.r, self.alpha_tilde, S_ini, delta_ini, timeline, nb_path, W)
 
     '''
     Create consistent path between pricing measure Q and physical measure P
     '''
 
-    def PathPQ(self, mu, alpha, timeline, nb_path):
+    def PathPQ(self, mu, alpha, S_ini, delta_ini, timeline, nb_path):
         W = multivariate_normal([0, 0], [[1, self.rho], [self.rho, 1]], (nb_path, len(timeline)))
-        return (self._Path(mu, alpha, timeline, nb_path, W), self._Path(self.r, self.alpha_tilde, timeline, nb_path, W))
+        return (self._Path(mu, alpha, S_ini, delta_ini, timeline, nb_path, W),
+                self._Path(self.r, self.alpha_tilde, S_ini, delta_ini, timeline, nb_path, W))
 
     ##############################################
     ### Joint distribution of State Variable
@@ -119,46 +118,57 @@ class Schwartz97:
                     - 2 / self.kappa * exp(-self.kappa * T) * (exp(self.kappa * t) - 1))
 
     def forward(self, t, T, S_ini, delta_ini):
-        assert t <= T
-        return exp(self.mu_X(S_ini, delta_ini, T-t) + 0.5 * self.var_X(T-t))
+        assert t >= 0
+        if less_equal(t, T):
+            return exp(self.mu_X(S_ini, delta_ini, T - t) + 0.5 * self.var_X(T - t))
+        else:
+            return zeros(S_ini.shape)
 
     def call(self, t, maturity_option, delivery_time_forward, K, S_ini, delta_ini):
-
-        assert t <= maturity_option
+        assert t >= 0
+        # assert t <= maturity_option
         assert maturity_option <= delivery_time_forward
 
-        mu = self.forward(t, delivery_time_forward, S_ini, delta_ini)
-        if t == maturity_option:  # it mean t = maturity_option and there is not stochasticity and no discount factor
-            return maximum(mu - K, 0)
+        if t <= maturity_option:
+            mu = self.forward(t, delivery_time_forward, S_ini, delta_ini)
+            if t == maturity_option:  # it mean t = maturity_option and there is not stochasticity and no discount factor
+                return maximum(mu - K, 0)
+            else:
+                sigmasq = self._sigmasq_F(maturity_option - t, delivery_time_forward)
+                mu = log(mu) - 0.5 * sigmasq
+                return generic_call(mu, sigmasq, K) * exp(-self.r * (maturity_option - t))
         else:
-            sigmasq = self._sigmasq_F(maturity_option - t, delivery_time_forward)
-            mu = log(mu) - 0.5 * sigmasq
-            return generic_call(mu, sigmasq, K) * exp(-self.r * (maturity_option - t))
+            return zeros(S_ini.shape)
 
     def put(self, t, maturity_option, delivery_time_forward, K, S_ini, delta_ini):
-        assert t <= maturity_option
+        assert t >= 0
+        # assert t <= maturity_option
         assert maturity_option <= delivery_time_forward
 
-        mu = self.forward(t, delivery_time_forward, S_ini, delta_ini)
-        if t == maturity_option:  # it mean t = maturity_option and there is not stochasticity and no discount factor
-            return maximum(K - mu, 0)
+        if t <= maturity_option:
+            mu = self.forward(t, delivery_time_forward, S_ini, delta_ini)
+            if t == maturity_option:  # it mean t = maturity_option and there is not stochasticity and no discount factor
+                return maximum(K - mu, 0)
+            else:
+                sigmasq = self._sigmasq_F(maturity_option - t, delivery_time_forward)
+                mu = log(mu) - 0.5 * sigmasq
+                return generic_put(mu, sigmasq, K) * exp(-self.r * (maturity_option - t))
         else:
-            sigmasq = self._sigmasq_F(maturity_option - t, delivery_time_forward)
-            mu = log(mu) - 0.5 * sigmasq
-            return generic_put(mu, sigmasq, K) * exp(-self.r * (maturity_option - t))
+            return zeros(S_ini.shape)
 
 
     def swap(self, t, exchange_time, maturities, S_ini, delta_ini):
-
+        assert t >= 0
         assert len(exchange_time) == len(maturities)
         assert all(less_equal(exchange_time, maturities))
-        assert t <= exchange_time[-1]
         # assert both should be sorted
-
-        index_t = bisect_left(exchange_time, t)
-        return exp(self.r * t) * sum(
-            [exp(-self.r * exchange_time[i]) * self.forward(t, maturities[i], S_ini, delta_ini)
-             for i in range(index_t, len(maturities))])
+        if t <= exchange_time[-1]:
+            index_t = bisect_left(exchange_time, t)
+            return exp(self.r * t) * sum(
+                [exp(-self.r * exchange_time[i]) * self.forward(t, maturities[i], S_ini, delta_ini)
+                 for i in range(index_t, len(maturities))])
+        else:
+            return zeros(S_ini.shape)
 
     ####################
     ### getter/setter
