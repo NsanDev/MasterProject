@@ -13,13 +13,16 @@ return list of functions of t,s,delta
 
 
 def create_contracts(mdl: Schwartz97, S_ini):
+    # TODO take care of the reference in the loops
+
+
     # T_M for forward: every month until T_horizon
     T_horizon = 1
     # maturities of option: every month from T_maturity_start until T_horizon
     T_maturity_start = 1 / 2
     # foreach maturity of option, forward with delivery date starting from 1 month later until
     # nb_month_max_option later(included)
-    nb_month_max_option = 6
+    nb_month_max_option = 4
     # Strike +- 6 relative to S0
     strike_option = array([k for k in range(-6, 6 + 1)]) + S_ini
 
@@ -35,26 +38,28 @@ def create_contracts(mdl: Schwartz97, S_ini):
         floor(12 * T_horizon)) + 1)])  # linspace(T_horizonCVA, T_horizonCVA+1, endpoint=True)
     relevant_times = set(time_forward)
     for T_M in time_forward:
-        book.append(lambda t, s, delta: mdl.forward(t=t, T=T_M, S_ini=s, delta_ini=delta))
+        book.append(lambda t, s, delta, T_M=T_M: mdl.forward(t=t, T=T_M, S_ini=s, delta_ini=delta))
         names_contracts.append("Forward $T_M$=" + str(T_M))
 
     #####################
     ### call put
     #####################
 
-    maturity_option = time_forward
+    maturity_option = [0.25, 0.5, 0.75, 1]
     relevant_times = relevant_times | set(maturity_option)
     time_forward_option = time_forward + T_maturity_start
     for T in maturity_option:
         for K in strike_option:
             for k in range(1, nb_month_max_option + 1):
-                book.append(lambda t, s, delta: mdl.call(t, maturity_option=T, delivery_time_forward=T + k / 12, \
-                                                         K=K, S_ini=s, delta_ini=delta))
-                book.append(lambda t, s, delta: mdl.put(t, maturity_option=T, delivery_time_forward=T + k / 12, \
-                                                        K=K, S_ini=s, delta_ini=delta))
-                names_contracts.append("Call T=" + str(maturity_option) + ", K="
+                book.append(lambda t, s, delta, T_M=T_M, K=K, k=k:
+                            mdl.call(t, maturity_option=T, delivery_time_forward=T + k / 12,
+                                     K=K, S_ini=s, delta_ini=delta))
+                book.append(lambda t, s, delta, T_M=T_M, K=K, k=k:
+                            mdl.put(t, maturity_option=T, delivery_time_forward=T + k / 12,
+                                    K=K, S_ini=s, delta_ini=delta))
+                names_contracts.append("Call T=" + str(T) + ", K="
                                        + str(K) + ", T_M=T+" + str(k) + "Months")
-                names_contracts.append("Put T=" + str(maturity_option) + ", K="
+                names_contracts.append("Put T=" + str(T) + ", K="
                                        + str(K) + ", T_M=T+" + str(k) + "Months")
 
     #####################

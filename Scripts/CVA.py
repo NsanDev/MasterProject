@@ -33,7 +33,12 @@ alpha = 0.106 - lamb / kappa
 model = Schwartz97(r=r, sigma_s=sigma_s, kappa=kappa, alpha_tilde=alpha, sigma_e=sigma_e, rho=corr)
 
 # simulation parameter
-nb_point_exposure = 10
+
+# Simulation
+Nsimulations = 1000
+random.seed(128)
+
+nb_point_exposure = 24
 nb_point_path = 20
 nb_point_intensity = 5
 start_exposure = 0.05
@@ -41,7 +46,7 @@ start_default = 0.1
 start_path = 0.01
 
 book, name_contracts, time_exposure1 = create_contracts(mdl=model, S_ini=S0)
-book = book[0:10]
+book = book  # [20:30]
 
 T_horizon_CVA = max(time_exposure1)
 
@@ -73,9 +78,7 @@ PD = Probabilities_CVA(hazard_rates=hazard_rates, timeline=array(timeline), time
 ### Simulation
 ###################
 
-# Simulation
-Nsimulations = 10
-random.seed(128)
+
 # market sensitivities
 
 simulated_paths = model.PathQ(S_ini=S0, delta_ini=delta0, timeline=timeline, nb_path=Nsimulations)
