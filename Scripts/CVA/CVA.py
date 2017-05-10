@@ -10,7 +10,7 @@ from numpy import transpose, sum, array, linspace, random, maximum
 
 from CreditModel.DirectionalWayRisk.Weights import Merton, Probabilities_CVA
 from CreditModel.Tools.RiskStatistics import risk_statistics
-from Scripts.portfolio import create_contracts
+from Scripts.CVA.portfolio import create_contracts
 from StochasticProcess.Commodities.Schwartz97 import Schwartz97
 
 if __name__ == '__main__':
@@ -35,7 +35,7 @@ model = Schwartz97(r=r, sigma_s=sigma_s, kappa=kappa, alpha_tilde=alpha, sigma_e
 # simulation parameter
 
 # Simulation
-Nsimulations = 1000
+Nsimulations = 10
 random.seed(128)
 
 nb_point_exposure = 24
