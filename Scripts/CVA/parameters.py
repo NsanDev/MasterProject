@@ -1,4 +1,4 @@
-from numpy import random, transpose, linspace, array, exp
+from numpy import random, transpose, linspace, array, exp, save, load
 
 from Scripts.CVA.portfolio import create_contracts
 from StochasticProcess.Commodities.Schwartz97 import Schwartz97
@@ -26,7 +26,7 @@ constant_intensity = 0.001  # have to be calibrated from cds
 ##############################
 ### MC Simulation
 ##############################
-nb_simulation = 100
+nb_simulation = 1000
 seed = 124
 
 # time discretization of path
@@ -37,6 +37,8 @@ start_path = 0.01
 nb_point_exposure = 24
 start_exposure = 0.05
 
+default_extension = '.npy'
+default_folder = 'data/'
 ##############################################################
 ### Constant and functions created from the parameters above.
 ##############################################################
@@ -66,6 +68,18 @@ def simulate_path(timeline):
 
 def Q_default(time_exposure):
     probabilities = exp(-constant_intensity * time_exposure)
-    probabilities = probabilities[:-1] - probabilities[1:]
+    probabilities[:-1] = probabilities[:-1] - probabilities[1:]
     probabilities[0] = 1 - probabilities[0]
     return probabilities
+
+
+def discount_factor(t):
+    return exp(-r * t)
+
+
+def save_array(data_array, name, extension=default_extension, folder=default_folder):
+    save(folder + name + extension, data_array)
+
+
+def load_array(data_array, name, extension=default_extension, folder=default_folder):
+    return load(folder + name + extension)

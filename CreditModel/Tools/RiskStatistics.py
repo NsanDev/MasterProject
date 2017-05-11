@@ -1,5 +1,6 @@
-from numpy import array, ones, dot
 import numpy as np
+from numpy import array, ones, dot
+
 
 def risk_statistics(values, weights=None, alpha=0.05):
 
@@ -26,6 +27,7 @@ def risk_statistics(values, weights=None, alpha=0.05):
     expected_exposure = np.sum(values * weights)
     value_at_risk_ini = sorted_vw[index_alpha_ini, 0]
     value_at_risk_end = sorted_vw[index_alpha_end, 0]
-    expected_shortfall = dot(sorted_vw[index_alpha_end:, 0] , sorted_vw[index_alpha_end:, 1]) / np.sum(sorted_vw[index_alpha_end:,1])
+    expected_shortfall = dot(sorted_vw[index_alpha_end:, 0], sorted_vw[index_alpha_end:, 1]) / np.sum(
+        sorted_vw[index_alpha_end:, 1])
 
     return [expected_exposure, value_at_risk_ini, value_at_risk_end, expected_shortfall]
