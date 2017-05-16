@@ -26,7 +26,7 @@ PD = cumulated_Q_default(time_exposure)
 ###################
 ### Compute cva
 ###################
-bs = linspace(start=-0.1, stop=0.1, num=11, endpoint=True)
+bs = linspace(start=-0.001, stop=0.001, num=11, endpoint=True)
 
 
 def calc_cva_hull(b, Z_M=Z_M):
