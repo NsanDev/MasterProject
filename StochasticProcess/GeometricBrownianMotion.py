@@ -3,7 +3,7 @@ Created on 20 mars 2017
 
 @author: Naitra
 '''
-from numpy import zeros,sqrt,power,array,exp,log
+from numpy import zeros, sqrt, array, exp, log
 from numpy.matlib import randn
 class GeometricBrownianMotion(object):
     '''

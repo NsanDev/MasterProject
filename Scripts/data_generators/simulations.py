@@ -2,7 +2,7 @@ import time
 
 from numpy import array
 
-from Scripts.data_generators.parameters import load_model, simulate_path, portfolio, save_array, exposure_function
+from Scripts.parameters import load_model, simulate_path, portfolio, save_array, exposure_function
 
 start_time = time.clock()
 ###################

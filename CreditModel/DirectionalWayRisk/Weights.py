@@ -1,6 +1,6 @@
 from bisect import bisect_left
 
-from numpy import sum, sqrt, vectorize, dot, exp, zeros, mean, log, array, newaxis, greater_equal, all
+from numpy import sum, sqrt, vectorize, dot, exp, zeros, mean, log, array, newaxis, all
 from scipy.stats import norm
 from statsmodels.distributions.empirical_distribution import ECDF
 
@@ -131,5 +131,5 @@ def Hull(b, Z, timeline, probability_default, times_default, times_exposure):
     a = array([piecewise_flat(t, probability_default, times_default) for t in timeline])
     a = a[:, newaxis]
     hazard_rates = a + b * Z
-    assert all(greater_equal(hazard_rates, 0))
+    # assert all(greater_equal(hazard_rates, 0))
     return Weights(hazard_rates, timeline, times_exposure)

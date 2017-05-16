@@ -1,6 +1,6 @@
 from numpy import mean
 
-from Scripts.data_generators.parameters import Q_default, discount_factor, save_array, load_array
+from Scripts.parameters import Q_default, discount_factor, save_array, load_array
 
 ###################
 ### Load Data saved in folder data

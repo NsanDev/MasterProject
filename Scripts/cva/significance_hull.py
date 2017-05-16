@@ -2,7 +2,7 @@ import statsmodels.api as sm
 from matplotlib.pyplot import figure, xlabel, plot, ylabel, grid, xlim
 from pandas import DataFrame
 
-from Scripts.data_generators.parameters import load_array
+from Scripts.parameters import load_array
 
 cva_indep = load_array('cva_indep')
 cva_hull = load_array('cva_hull')
