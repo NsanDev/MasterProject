@@ -17,14 +17,16 @@ for k in range(0, len(rhos_merton)):
     y = cva_merton[k]
     model = sm.OLS(endog=y, exog=x)  # no intercept by default
     fitted = model.fit()
-    alphas.append(fitted.params)
-    pvalues.append(fitted.pvalues)
+    alphas.append(*fitted.params)
+    pvalues.append(*fitted.pvalues)
     rsquared_adj.append(fitted.rsquared_adj)
 
-df = DataFrame({'$\alpha$': alphas,
-                '$p-value$': pvalues,
-                '$R_{adj}$': rsquared_adj},
-               index=rhos_merton)
+df = DataFrame({'rho': rhos_merton,
+                'alpha': alphas,
+                'p-value': pvalues,
+                'R_{adj}': rsquared_adj})
+df = df[['rho', 'alpha', 'R_{adj}', 'p-value']]
+latex_table = df.to_latex(index=False)
 
 fig = figure()
 plot(rhos_merton, alphas)

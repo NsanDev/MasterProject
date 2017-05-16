@@ -78,6 +78,9 @@ def Q_default(time_exposure):
     return probabilities
 
 
+def cumulated_Q_default(time_exposure):
+    return exp(-constant_intensity * time_exposure)
+
 def discount_factor(t):
     return exp(-r * t)
 

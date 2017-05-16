@@ -20,7 +20,6 @@ Z_M = Exposures
 DiscountFactorXdefault = Q_default(time_exposure) * discount_factor(time_exposure)
 range_exposure = range(0, len(time_exposure))
 range_portfolio = range(0, len(V))
-PD = Q_default(time_exposure)
 
 ###################
 ### Compute cva

@@ -1,8 +1,10 @@
 from bisect import bisect_left
 
-from numpy import sum, sqrt, vectorize, dot, exp, zeros, mean, log
+from numpy import sum, sqrt, vectorize, dot, exp, zeros, mean, log, array, newaxis
 from scipy.stats import norm
 from statsmodels.distributions.empirical_distribution import ECDF
+
+from Maths.PiecewiseFlat import piecewise_flat
 
 '''
 Compute weights from the Merton Model
@@ -71,7 +73,7 @@ def Weights(hazard_rates, timeline, times_exposure):
     result = exp(result)
     for t in range(len(times_exposure) - 1, 0, -1):
         result[t] = result[t-1] - result[t]
-        result[t] = result[t]/sum(result[t])  # normalization
+        result[t] = result[t] / sum(result[t])  # normalization
     result[0] = 1 - result[0]
     result[0] = result[0] / sum(result[0])
     return result
@@ -123,3 +125,11 @@ def Calibration_hull(b, Z, timeline, probability_default, times_default):
     # TODO test that
     return a
 
+
+def Hull(b, Z, timeline, probability_default, times_default, times_exposure):
+    step_const_a = Calibration_hull(b, Z, timeline, probability_default, times_default)
+    a = array([piecewise_flat(t, probability_default, times_default) for t in timeline])
+    a = a[:, newaxis]
+    hazard_rates = a + b * Z
+    w = Weights(hazard_rates, timeline, times_exposure)
+    return Weights(hazard_rates, timeline, times_exposure)
