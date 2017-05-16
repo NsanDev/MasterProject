@@ -1,8 +1,6 @@
 import time
 
-from numpy import maximum, save
-
-from Scripts.CVA.parameters import load_model, simulate_path, portfolio
+from Scripts.data_generators.parameters import load_model, simulate_path, portfolio, save_array, exposure_function
 
 start_time = time.clock()
 ###################
@@ -33,17 +31,15 @@ V = [[instrument(timeline[t], S[t, :], convenience_yield[t, :]) for t in index_e
 ###################
 ### Exposure
 ###################
-Collateral_level = 0
-Exposure_function = lambda V: maximum(V - Collateral_level, 0)
-Exposures = [[Exposure_function(contract[t]) for t in range_exposure] for contract in V]
+Exposures = [[exposure_function(contract[t]) for t in range_exposure] for contract in V]
 
-save('timeline', timeline)
-save('time_exposure', time_exposure)
-save('spot_prices', S)
-save('convenience_yields', convenience_yield)
-save('contracts', V)
-save('contract_names', contract_names)
-save('exposures', Exposures)
+save_array('timeline', timeline)
+save_array('time_exposure', time_exposure)
+save_array('spot_prices', S)
+save_array('convenience_yields', convenience_yield)
+save_array('contracts', V)
+save_array('contract_names', contract_names)
+save_array('exposures', Exposures)
 
 timeperf = time.clock() - start_time
 print(timeperf)

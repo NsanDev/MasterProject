@@ -1,6 +1,6 @@
-from numpy import random, transpose, linspace, array, exp, save, load
+from numpy import random, transpose, linspace, array, exp, save, load, maximum
 
-from Scripts.CVA.portfolio import create_contracts
+from Scripts.data_generators.portfolio import create_contracts
 from StochasticProcess.Commodities.Schwartz97 import Schwartz97
 
 ##############################
@@ -15,6 +15,11 @@ sigma_e = 0.527
 corr = 0.766
 lamb = 0.198
 alpha = 0.106 - lamb / kappa
+
+##############################
+### MC Simulation
+##############################
+Collateral_level = lambda MtM_value: 0  ## No collateral
 
 ##############################
 ### Parameters for hazard rate
@@ -38,7 +43,7 @@ nb_point_exposure = 24
 start_exposure = 0.05
 
 default_extension = '.npy'
-default_folder = 'data/'
+default_folder = '../data/'
 ##############################################################
 ### Constant and functions created from the parameters above.
 ##############################################################
@@ -68,7 +73,7 @@ def simulate_path(timeline):
 
 def Q_default(time_exposure):
     probabilities = exp(-constant_intensity * time_exposure)
-    probabilities[:-1] = probabilities[:-1] - probabilities[1:]
+    probabilities[1:] = probabilities[:-1] - probabilities[1:]
     probabilities[0] = 1 - probabilities[0]
     return probabilities
 
@@ -77,9 +82,13 @@ def discount_factor(t):
     return exp(-r * t)
 
 
-def save_array(data_array, name, extension=default_extension, folder=default_folder):
+def exposure_function(MtM_value):
+    return maximum(MtM_value - Collateral_level(MtM_value), 0)
+
+
+def save_array(name, data_array, extension=default_extension, folder=default_folder):
     save(folder + name + extension, data_array)
 
 
-def load_array(data_array, name, extension=default_extension, folder=default_folder):
+def load_array(name, extension=default_extension, folder=default_folder):
     return load(folder + name + extension)

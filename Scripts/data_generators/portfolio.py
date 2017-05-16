@@ -53,10 +53,10 @@ def create_contracts(mdl: Schwartz97):
     for T in maturity_option:
         for K in strike_option:
             for k in delivery_after_exercise:
-                book.append(lambda t, s, delta, T_M=T_M, K=K, k=k:
+                book.append(lambda t, s, delta, T=T, T_M=T_M, K=K, k=k:
                             mdl.call(t, maturity_option=T, delivery_time_forward=T + k / 12,
                                      K=K, S_ini=s, delta_ini=delta))
-                book.append(lambda t, s, delta, T_M=T_M, K=K, k=k:
+                book.append(lambda t, s, delta, T=T, T_M=T_M, K=K, k=k:
                             mdl.put(t, maturity_option=T, delivery_time_forward=T + k / 12,
                                     K=K, S_ini=s, delta_ini=delta))
                 names_contracts.append("Call T=" + str(T) + ", K="
@@ -72,32 +72,36 @@ def create_contracts(mdl: Schwartz97):
     exchange_time = array([k / 12 for k in range(1, int(floor(12 * T_horizon)) + 1)])
     cashflow_times = cashflow_times | set(exchange_time)
     time_delivery = exchange_time + (12 / 1) ** -1
-    book.append(lambda t, s, delta: mdl.swap(t=t, exchange_time=exchange_time,
-                                             maturities=time_delivery, S_ini=s, delta_ini=delta))
+    book.append(lambda t, s, delta, exchange_time=exchange_time, time_delivery=time_delivery
+                : mdl.swap(t=t, exchange_time=exchange_time, maturities=time_delivery, S_ini=s,
+                           delta_ini=delta))
     names_contracts.append("Monthly Swap T=" + str(maturity_option))
 
     # 3-months swap
     exchange_time = array([k / 4 for k in range(1, int(floor(12 / 4 * T_horizon)) + 1)])
     cashflow_times = cashflow_times | set(exchange_time)
     time_delivery = exchange_time + (12 / 4) ** -1
-    book.append(lambda t, s, delta: mdl.swap(t=t, exchange_time=exchange_time,
-                                             maturities=time_delivery, S_ini=s, delta_ini=delta))
+    book.append(lambda t, s, delta, exchange_time=exchange_time, time_delivery=time_delivery
+                : mdl.swap(t=t, exchange_time=exchange_time, maturities=time_delivery, S_ini=s,
+                           delta_ini=delta))
     names_contracts.append("3-months Swap T=" + str(maturity_option))
 
     # 4-months swap
     exchange_time = array([k / 3 for k in range(1, int(floor(12 / 3 * T_horizon)) + 1)])
     cashflow_times = cashflow_times | set(exchange_time)
     time_delivery = exchange_time + (12 / 3) ** -1
-    book.append(lambda t, s, delta: mdl.swap(t=t, exchange_time=exchange_time,
-                                             maturities=time_delivery, S_ini=s, delta_ini=delta))
+    book.append(lambda t, s, delta, exchange_time=exchange_time, time_delivery=time_delivery
+                : mdl.swap(t=t, exchange_time=exchange_time, maturities=time_delivery, S_ini=s,
+                           delta_ini=delta))
     names_contracts.append("4-months Swap T=" + str(maturity_option))
 
     # 6-months swap
     exchange_time = array([k / 6 for k in range(1, int(floor(12 / 6 * T_horizon)) + 1)])
     cashflow_times = cashflow_times | set(exchange_time)
     time_delivery = exchange_time + (12 / 6) ** -1
-    book.append(lambda t, s, delta: mdl.swap(t=t, exchange_time=exchange_time,
-                                             maturities=time_delivery, S_ini=s, delta_ini=delta))
+    book.append(lambda t, s, delta, exchange_time=exchange_time, time_delivery=time_delivery
+                : mdl.swap(t=t, exchange_time=exchange_time, maturities=time_delivery, S_ini=s,
+                           delta_ini=delta))
     names_contracts.append("6-months Swap T=" + str(maturity_option))
 
     # book = [vectorize(instr) for instr in portfolio]

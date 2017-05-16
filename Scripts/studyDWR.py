@@ -135,7 +135,7 @@ resultsDWR = array(
 # first dimension is time
 
 ###################
-### CVA
+### cva
 ###################
 
 DiscountFactorXdefault = exp(-r*time_exposure)*PD

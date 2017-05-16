@@ -10,7 +10,7 @@ from numpy import transpose, sum, array, linspace, random, maximum
 
 from CreditModel.DirectionalWayRisk.Weights import Merton, Probabilities_CVA
 from CreditModel.Tools.RiskStatistics import risk_statistics
-from Scripts.CVA.portfolio import create_contracts
+from Scripts.data_generators.portfolio import create_contracts
 from StochasticProcess.Commodities.Schwartz97 import Schwartz97
 
 if __name__ == '__main__':
@@ -128,7 +128,7 @@ resultsDWR = array(
 # first dimension is time
 
 ###################
-### CVA
+### cva
 ###################
 
 DiscountFactorXdefault = exp(-r * array(time_exposure)) * PD
