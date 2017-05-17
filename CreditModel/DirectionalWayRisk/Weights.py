@@ -1,10 +1,9 @@
 from bisect import bisect_left
 
-from numpy import sum, sqrt, vectorize, dot, exp, zeros, mean, log, array, newaxis, all
+from numpy import sum, sqrt, vectorize, dot, exp, zeros, mean, newaxis, all
+from scipy.optimize import newton
 from scipy.stats import norm
 from statsmodels.distributions.empirical_distribution import ECDF
-
-from Maths.PiecewiseFlat import piecewise_flat
 
 '''
 Compute weights from the Merton Model
@@ -105,31 +104,44 @@ b: defined in Hull 2012
 Z: Market factor or transformation of Market factor (more generic than value of portfolio)
 probability_default: P(tau<t) for t in times_default. should be calibrated from cds
 times_default: times to define P(tau<t) as a piecewise flat function
-'''
-def Calibration_hull(b, Z, timeline, probability_default, times_default):
 
+return evaluation of piecewise_flat function a in each time in timeline
+'''
+
+
+def Calibration_hull(b, Z, timeline, survival_probability, times_default, max_iter=10000, tol=1e-03):
+    # TODO add derivative for Newton-Raphson
     assert (timeline[0]>0)
     assert (all(t in timeline for t in times_default))
     assert (all(timeline[i] < timeline[i + 1] for i in range(0, len(timeline) - 1)))
     assert (len(Z) == len(timeline))
 
-    a = zeros(len(times_default))
-    a[0] = log(mean(exp(-b * _integrate_intensity(times_default[0], Z, timeline))) /
-               (1 - probability_default[0])) / times_default[0]
-    cumulative_a = times_default[0]*a[0]
+    a = zeros(len(timeline))
+    a = a[:, newaxis]
+    i_min = 0
+    i_max = bisect_left(timeline, times_default[0]) + 1
+
+    def f(x):
+        a[i_min:i_max] = x
+        return mean(exp(-_integrate_intensity(times_default[0], exp(a + b * Z), timeline))) - survival_probability[0]
+
+    a[i_min:i_max] = newton(f, 0, fprime=None, tol=tol, maxiter=max_iter, fprime2=None)
+
     for k in range(1, len(times_default)):
-        a[k] = (- cumulative_a + log(mean(exp(-b * _integrate_intensity(times_default[k], Z, timeline)))
-                                     / (1 - probability_default[k]))) \
-               / (times_default[k] - times_default[k - 1])
-        cumulative_a = cumulative_a + a[k] * (times_default[k] - times_default[k - 1])
+        i_min = i_max
+        i_max = min(bisect_left(timeline, times_default[k]) + 1, len(a))
+
+        def f(x):
+            a[i_min:i_max] = x
+            return mean(exp(-_integrate_intensity(times_default[k], exp(a + b * Z), timeline))) - survival_probability[
+                k]
+
+        a[i_min:i_max] = newton(f, 0, fprime=None, tol=tol, maxiter=max_iter, fprime2=None)
     # TODO test that
     return a
 
 
-def Hull(b, Z, timeline, probability_default, times_default, times_exposure):
-    step_const_a = Calibration_hull(b, Z, timeline, probability_default, times_default)
-    a = array([piecewise_flat(t, probability_default, times_default) for t in timeline])
-    a = a[:, newaxis]
-    hazard_rates = a + b * Z
-    # assert all(greater_equal(hazard_rates, 0))
+def Hull(b, Z, timeline, survival_probability, times_default, times_exposure, max_iter=10000, tol=1e-3):
+    a = Calibration_hull(b, Z, timeline, survival_probability, times_default, max_iter=max_iter, tol=tol)
+    hazard_rates = exp(a + b * Z)
     return Weights(hazard_rates, timeline, times_exposure)

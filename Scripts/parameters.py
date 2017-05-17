@@ -78,7 +78,7 @@ def Q_default(time_exposure):
     return probabilities
 
 
-def cumulated_Q_default(time_exposure):
+def cumulated_Q_survival(time_exposure):
     return exp(-constant_intensity * time_exposure)
 
 

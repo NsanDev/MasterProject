@@ -89,26 +89,45 @@ class testCreditModel(unittest.TestCase):
             for j in range(0, len(weights[0])):
                 self.assertAlmostEqual(actual_weights[i][j], weights[i][j])
 
-    def test_Calibration_hull(self):
-        timeline = array([2, 4, 6, 8])  # it crashes when this is not an array
-        times_default = [2, 4, 8]
-        probability_default = [0.5, 0.2, 0.1]
-        b = 0.1
-        random.seed(100)
-        Z = array([[4, 5.2], [45, 1.6], [45, 12.4], [45, 2.23]])
-        a = Calibration_hull(b, Z, timeline, probability_default, times_default)
-        p0 = 1 - exp(-a[0] * times_default[0]
-                     - b * Z[0, :] * times_default[0])
-        p1 = 1 - exp(-a[0] * times_default[0] - a[1] * (times_default[1] - times_default[0])
-                     - b * (Z[0, :] * timeline[0] + Z[1, :] * (timeline[1] - timeline[0])))
-        p2 = 1 - exp(- a[0] * times_default[0] - a[1] * (times_default[1] - times_default[0])
-                     - a[2] * (times_default[2] - times_default[1])
-                     - b * (Z[0, :] * timeline[0] + Z[1, :] * (timeline[1] - timeline[0])
-                            + Z[2, :] * (timeline[2] - timeline[1]) + Z[3, :] * (timeline[3] - timeline[2])))
+    def test_hull(self):
+        timeline = array([2, 4, 6, 6.5])  # it crashes when this is not an array
+        times_default = [2, 4, 6.5]
+        times_exposure = [4, 6.5]
 
-        self.assertAlmostEqual(mean(p0), probability_default[0], delta=1E-10)
-        self.assertAlmostEqual(mean(p1), probability_default[1], delta=1E-10)
-        self.assertAlmostEqual(mean(p2), probability_default[2], delta=1E-10)
+        survival_probability = [0.5, 0.2, 0.1]
+        b = 0.001
+        random.seed(100)
+        Z = array([[4, 5.2], [4.5, 5.6], [4.1, 5.4], [4.2, 5.23]])
+
+        max_iter = 100000
+        tol = 1e-7
+
+        a = Calibration_hull(b, Z, timeline, survival_probability, times_default, max_iter, tol)
+
+        N_iter = 1000000
+        h = a + b * Z
+        h = exp(h)
+        p0 = exp(-h[0] * (timeline[0]))
+        p1 = exp(-h[0] * (timeline[0]) - h[1] * (timeline[1] - timeline[0]))
+        p2 = exp(-h[0] * (timeline[0]) - h[1] * (timeline[1] - timeline[0]) - h[2] * (timeline[2] - timeline[1])
+                 - h[3] * (timeline[3] - timeline[2]))
+
+        z = mean(exp(-_integrate_intensity(times_default[2], exp(a + b * Z), timeline))) - survival_probability[2]
+
+        self.assertAlmostEqual(mean(p0), survival_probability[0], delta=tol)
+        self.assertAlmostEqual(mean(p1), survival_probability[1], delta=tol)
+        self.assertAlmostEqual(mean(p2), survival_probability[2], delta=tol)
+
+        calculated_weights = Hull(b, Z, timeline, survival_probability, times_default, times_exposure
+                                  , max_iter=max_iter, tol=tol)
+        w1 = (1 - p1) / sum(1 - p1)
+        w2 = (p2 - p1) / sum(p2 - p1)
+        expected_weights = array([w1, w2])
+        self.assertAlmostEqual(w1[0], calculated_weights[0, 0])
+        self.assertAlmostEqual(w1[1], calculated_weights[0, 1])
+        self.assertAlmostEqual(w2[0], calculated_weights[1, 0])
+        self.assertAlmostEqual(w2[1], calculated_weights[1, 1])
+
 
 if __name__ == '__main__':
     unittest.main()

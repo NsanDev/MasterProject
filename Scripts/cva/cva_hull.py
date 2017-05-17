@@ -4,7 +4,7 @@ from numpy import array, linspace
 from pandas import DataFrame
 
 from CreditModel.DirectionalWayRisk.Weights import Hull
-from Scripts.parameters import Q_default, discount_factor, load_array, cumulated_Q_default
+from Scripts.parameters import Q_default, discount_factor, load_array, cumulated_Q_survival
 
 ###################
 ### Load Data saved in folder data
@@ -21,21 +21,26 @@ range_exposure = range(0, len(time_exposure))
 range_portfolio = range(0, len(V_alltimes))
 
 time_default = array([timeline[-1]])
-PD = cumulated_Q_default(time_default)
+PD = cumulated_Q_survival(time_default)
 
 ###################
 ### Choose Parameters on Hull
 ###################
 Z_M = V_alltimes  # need all times, not only at exposure
-bs_hull = linspace(start=-0.1, stop=0.1, num=30, endpoint=True)
 
+# Newton Raphson fails to converge when b is to big (around 0.1)
+# It should be because of one of a swap which has value around
+bs_hull = linspace(start=-0.001, stop=0.001, num=11, endpoint=True)
+
+max_iter = 100000
+tol = 1e-3
 
 ###################
 ### Compute cva
 ###################
 
 def calc_cva_hull(b, Z_M=Z_M):
-    weightsHull = [Hull(b, Z=Z_M[k], timeline=timeline, probability_default=PD, times_default=time_default,
+    weightsHull = [Hull(b, Z=Z_M[k], timeline=timeline, survival_probability=PD, times_default=time_default,
                         times_exposure=time_exposure) for k in range_portfolio]
     resultsDWR = array(
         [[sum(Z_M[k][index_exposure[t]] * weightsHull[k][t]) for t in range_exposure] for k in range_portfolio])

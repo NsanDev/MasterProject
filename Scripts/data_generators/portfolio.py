@@ -18,7 +18,7 @@ T_maturity_start = 1 / 2
 # foreach maturity of option, forward with delivery date starting from 1 month later until
 # nb_month_max_option later(included)
 nb_month_max_option = 4
-# Strike +- 6 relative to S0
+# Strike +- 3 relative to S0
 strike_option = array([k for k in range(-3, 3 + 1)]) + 45
 # maturity of options
 maturity_option = [0.25, 0.5, 1]
