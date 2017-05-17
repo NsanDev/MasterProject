@@ -1,5 +1,5 @@
 import statsmodels.api as sm
-from matplotlib.pyplot import figure, xlabel, plot, ylabel, grid, xlim
+from matplotlib.pyplot import figure, xlabel, plot, ylabel, grid, xlim, ticklabel_format
 from numpy import array, linspace
 from pandas import DataFrame
 
@@ -75,6 +75,7 @@ plot(bs_hull, alphas)
 xlabel(r'$b$', fontsize=14)
 ylabel(r'$\alpha$', fontsize=14)
 grid(True, linestyle='--')
+ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
 xlim(xmin=min(bs_hull), xmax=max(bs_hull))
 fig.savefig(r'..\pictures\cva\alphas_hull.png')
 
