@@ -49,7 +49,7 @@ for d_ini in deltas:  # 3 is the number of parameters
     fwd = vectorize(lambda T: model.forward(0, T, S0, d_ini))
     tenor_curve = fwd(tenors)
     plot(tenors, tenor_curve, label='$\delta=$' + str(d_ini))
-xlabel('Tenor')
+xlabel('Delivery time (year)')
 legend(ncol=1, loc='lower left', bbox_to_anchor=(0, 0))
 grid(linestyle='--', linewidth=1, axis='y')
 xlim(xmin=0, xmax=max(tenors))

@@ -1,10 +1,12 @@
+from time import clock
+
 import statsmodels.api as sm
 from matplotlib.pyplot import figure, xlabel, plot, ylabel, grid, xlim, ticklabel_format
 from numpy import array, linspace
 from pandas import DataFrame
 
 from CreditModel.DirectionalWayRisk.Weights import Hull
-from Scripts.parameters import Q_default, discount_factor, load_array, cumulated_Q_survival
+from Scripts.parameters import Q_default, discount_factor, load_array, cumulated_Q_survival, save_array
 
 ###################
 ### Load Data saved in folder data
@@ -39,6 +41,7 @@ tol = 1e-3
 ### Compute cva
 ###################
 
+
 def calc_cva_hull(b, Z_M=Z_M):
     weightsHull = [Hull(b, Z=Z_M[k], timeline=timeline, survival_probability=PD, times_default=time_default,
                         times_exposure=time_exposure) for k in range_portfolio]
@@ -47,9 +50,12 @@ def calc_cva_hull(b, Z_M=Z_M):
     return [sum(resultsDWR[k, :] * DiscountFactorXdefault) for k in range_portfolio]
 
 
+t2 = clock()
 cva_hull = [calc_cva_hull(b, Z_M=Z_M) for b in bs_hull]
-# save_array('bs_hull', bs)
-# save_array('cva_hull', cva_hull)
+t2 = clock() - t2
+
+save_array('bs_hull', bs_hull)
+save_array('cva_hull', cva_hull)
 alphas = []
 pvalues = []
 rsquared_adj = []
