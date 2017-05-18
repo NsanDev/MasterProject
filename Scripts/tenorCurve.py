@@ -45,7 +45,7 @@ deltas = linspace(-0.2, 0.2, num=5, endpoint=True)
 ###################
 
 fig = figure()
-for d_ini in deltas:  # 3 is the number of parameters
+for d_ini in deltas:
     fwd = vectorize(lambda T: model.forward(0, T, S0, d_ini))
     tenor_curve = fwd(tenors)
     plot(tenors, tenor_curve, label='$\delta=$' + str(d_ini))
