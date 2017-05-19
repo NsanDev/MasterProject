@@ -101,7 +101,7 @@ def Probabilities_CVA(hazard_rates, timeline, times_exposure):
 '''
 This calibrator can be reused for specific + global way risk model
 b: defined in Hull 2012
-Z: Market factor or transformation of Market factor (more generic than value of portfolio)
+Z: any transformation of the Market factor (more generic than value of portfolio)
 probability_default: P(tau<t) for t in times_default. should be calibrated from cds
 times_default: normaly chosen as times t_i where we have P(tau<t_i) as a piecewise flat function. 
                but can also be times t_a at which a will be calibrated
@@ -142,7 +142,14 @@ def Calibration_hull(b, Z, timeline, survival_probability, times_default, max_it
     return a
 
 
-def Hull(b, Z, timeline, survival_probability, times_default, times_exposure, max_iter=10000, tol=1e-3):
-    a = Calibration_hull(b, Z, timeline, survival_probability, times_default, max_iter=max_iter, tol=tol)
+# TODO: implement generic Hull with multidimensional market factor
+def Hull(b, Z_M, timeline, survival_probability, times_survival, times_exposure, max_iter=10000, tol=1e-3):
+    # assert(len(b) == len(Z_M))
+    Z = zeros(Z_M[0].shape)
+    Z = Z_M
+    # for i in range(0,len(b)):
+    #    Z = Z + b[i]*Z_M[i]
+
+    a = Calibration_hull(b, Z, timeline, survival_probability, times_survival, max_iter=max_iter, tol=tol)
     hazard_rates = exp(a + b * Z)
     return Weights(hazard_rates, timeline, times_exposure)

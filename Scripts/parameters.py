@@ -1,6 +1,6 @@
 from numpy import random, transpose, linspace, array, exp, save, load, maximum
 
-from Scripts.data_generators.portfolio import create_contracts
+from Scripts.portfolio import create_contracts
 from StochasticProcess.Commodities.Schwartz97 import Schwartz97
 
 ##############################

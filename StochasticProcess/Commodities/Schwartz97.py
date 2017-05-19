@@ -156,16 +156,16 @@ class Schwartz97:
         else:
             return zeros(S_ini.shape)
 
-
-    def swap(self, t, exchange_time, maturities, S_ini, delta_ini):
+    def swap(self, t, exchange_time, maturities, fixed_legs, S_ini, delta_ini):
         assert t >= 0
         assert len(exchange_time) == len(maturities)
+        assert len(exchange_time) == len(fixed_legs)
         assert all(less_equal(exchange_time, maturities))
         # assert both should be sorted
         if t <= exchange_time[-1]:
             index_t = bisect_left(exchange_time, t)
             return exp(self.r * t) * sum(
-                [exp(-self.r * exchange_time[i]) * self.forward(t, maturities[i], S_ini, delta_ini)
+                [exp(-self.r * exchange_time[i]) * (self.forward(t, maturities[i], S_ini, delta_ini) - fixed_legs[i])
                  for i in range(index_t, len(maturities))])
         else:
             return zeros(S_ini.shape)

@@ -10,7 +10,6 @@ from Scripts.parameters import discount_factor, save_array, load_array
 Exposures = load_array('exposures')
 timeline = load_array('timeline')
 time_exposure = load_array('time_exposure')
-time_default = [timeline[-1]]
 range_exposure = range(0, len(time_exposure))
 range_portfolio = range(0, len(Exposures))
 index_exposure = [list(timeline).index(t) for t in time_exposure]
@@ -56,27 +55,32 @@ def generate_cva_merton(Z_M, rhos_merton, Q_default, name_saved_file):
 
     save_array(name_saved_file, curve_cva(rhos_merton))
 
-
     # TODO: finish that cva calculator for different values of rho (Loop).
     # TODO: Think about the cases where rho = 0 or rho = 1
 
 
 def generate_cva_hull(Z_M, bs_hull, Q_default, name_saved_file, max_iter=100000, tol=1e-3):
     # need all times for the market factor, not only at exposure
-    default_probabilities = Q_default(time_exposure)
+
+    # Calculate the default probabilities at times at which we want to calibrate the 'a's parameters
+    # it takes 10 min when I try to find a's for all points in time_exposure
+    # time_default = array([timeline[-1]])
+    time_default = time_exposure  # array([timeline[int(len(timeline)/3)],timeline[2*int(len(timeline)/3)],timeline[-1]]) # TODO: see if I have to calibrate at more times
+    default_probabilities = Q_default(time_default)
     survival_probability = zeros(len(default_probabilities))
     survival_probability[0] = 1 - default_probabilities[0]
     for k in range(1, len(default_probabilities)):
         survival_probability[k] = survival_probability[k - 1] - default_probabilities[k]
 
-    DiscountFactorXdefault = default_probabilities * discount_factor(time_exposure)
+    DiscountFactorXdefault = Q_default(time_exposure) * discount_factor(time_exposure)
 
     # Newton Raphson fails to converge when b*Z_M are to big (b around 0.1 with Z_M aroud 500)
     # It should be because of one of a swap which has value around
 
     def calc_cva_hull(b):
         weightsHull = [
-            Hull(b, Z=Z_M[k], timeline=timeline, survival_probability=survival_probability, times_default=time_default,
+            Hull(b, Z_M=Z_M[k], timeline=timeline, survival_probability=survival_probability,
+                 times_survival=time_default,
                  times_exposure=time_exposure, max_iter=max_iter, tol=tol) for k in range_portfolio]
         resultsDWR = array(
             [[sum(Z_M[k][index_exposure[t]] * weightsHull[k][t]) for t in range_exposure] for k in range_portfolio])

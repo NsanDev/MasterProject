@@ -69,53 +69,62 @@ class testStochasticProcess(unittest.TestCase):
         self.assertAlmostEqual(model.forward(0, 5.654, S0, delta0), S0 * exp(model.A(5.654) + model.B(5.654) * delta0)
                          , delta=1E-10)
         self.assertEqual(model.forward(0, 5.654, S0, delta0),
-                         model.swap(t=0, exchange_time=[0], maturities=[5.654], S_ini=S0, delta_ini=delta0))
+                         model.swap(t=0, exchange_time=[0], maturities=[5.654], fixed_legs=[0], S_ini=S0,
+                                    delta_ini=delta0))
 
 
         ########################################
         ### Swap
         ########################################
-
+        fixed_legs = [40, 45, 50]
         t = 0.56977
-        self.assertAlmostEqual(model.forward(t, 1.1, S0, delta0)*exp(-r*(1 - t))
-                         + model.forward(t, 1.6, S0, delta0)*exp(-r*(1.5 - t))
-                         + model.forward(t, 1.8, S0, delta0) * exp(-r*(1.75 - t)),
-                         model.swap(t=t, exchange_time=[1,1.5,1.75], maturities=[1.1,1.6,1.8], S_ini=S0,
-                                    delta_ini=delta0))
+        self.assertAlmostEqual((model.forward(t, 1.1, S0, delta0) - 40) * exp(-r * (1 - t))
+                               + (model.forward(t, 1.6, S0, delta0) - 45) * exp(-r * (1.5 - t))
+                               + (model.forward(t, 1.8, S0, delta0) - 50) * exp(-r * (1.75 - t)),
+                               model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8],
+                                          fixed_legs=fixed_legs,
+                                          S_ini=S0, delta_ini=delta0))
         t = 1
-        self.assertAlmostEqual(model.forward(t, 1.1, S0, delta0)*exp(-r*(1 - t))
-                         + model.forward(t, 1.6, S0, delta0)*exp(-r*(1.5 - t))
-                         + model.forward(t, 1.8, S0, delta0) * exp(-r*(1.75 - t)),
-                         model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8], S_ini=S0,
-                                    delta_ini=delta0))
+        self.assertAlmostEqual((model.forward(t, 1.1, S0, delta0) - 40) * exp(-r * (1 - t))
+                               + (model.forward(t, 1.6, S0, delta0) - 45) * exp(-r * (1.5 - t))
+                               + (model.forward(t, 1.8, S0, delta0) - 50) * exp(-r * (1.75 - t)),
+                               model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8],
+                                          fixed_legs=fixed_legs,
+                                          S_ini=S0, delta_ini=delta0))
         t = 1.2
-        self.assertAlmostEqual(model.forward(t, 1.6, S0, delta0)*exp(-r*(1.5 - t))
-                         + model.forward(t, 1.8, S0, delta0) * exp(-r*(1.75 - t)),
-                         model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8], S_ini=S0,
-                                    delta_ini=delta0))
+        self.assertAlmostEqual((model.forward(t, 1.6, S0, delta0) - 45) * exp(-r * (1.5 - t))
+                               + (model.forward(t, 1.8, S0, delta0) - 50) * exp(-r * (1.75 - t)),
+                               model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8],
+                                          fixed_legs=fixed_legs,
+                                          S_ini=S0, delta_ini=delta0))
         t = 1.4446
-        self.assertAlmostEqual(model.forward(t, 1.6, S0, delta0)*exp(-r*(1.5 - t))
-                         + model.forward(t, 1.8, S0, delta0) * exp(-r*(1.75 - t)),
-                         model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8], S_ini=S0,
-                                    delta_ini=delta0))
+        self.assertAlmostEqual((model.forward(t, 1.6, S0, delta0) - 45) * exp(-r * (1.5 - t))
+                               + (model.forward(t, 1.8, S0, delta0) - 50) * exp(-r * (1.75 - t)),
+                               model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8],
+                                          fixed_legs=fixed_legs,
+                                          S_ini=S0, delta_ini=delta0))
 
         t = 1.5
-        self.assertAlmostEqual(model.forward(t, 1.6, S0, delta0)*exp(-r*(1.5 - t))
-                         + model.forward(t, 1.8, S0, delta0) * exp(-r*(1.75 - t)),
-                         model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8], S_ini=S0,
-                                    delta_ini=delta0))
+        self.assertAlmostEqual((model.forward(t, 1.6, S0, delta0) - 45) * exp(-r * (1.5 - t))
+                               + (model.forward(t, 1.8, S0, delta0) - 50) * exp(-r * (1.75 - t)),
+                               model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8],
+                                          fixed_legs=fixed_legs,
+                                          S_ini=S0, delta_ini=delta0))
         t = 1.6
-        self.assertAlmostEqual(model.forward(t, 1.8, S0, delta0) * exp(-r*(1.75 - t)),
-                         model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8], S_ini=S0,
-                                    delta_ini=delta0))
+        self.assertAlmostEqual((model.forward(t, 1.8, S0, delta0) - 50) * exp(-r * (1.75 - t)),
+                               model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8],
+                                          fixed_legs=fixed_legs,
+                                          S_ini=S0, delta_ini=delta0))
         t = 1.714385
-        self.assertAlmostEqual(model.forward(t, 1.8, S0, delta0) * exp(-r*(1.75 - t)),
-                         model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8], S_ini=S0,
-                                    delta_ini=delta0))
+        self.assertAlmostEqual((model.forward(t, 1.8, S0, delta0) - 50) * exp(-r * (1.75 - t)),
+                               model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8],
+                                          fixed_legs=fixed_legs,
+                                          S_ini=S0, delta_ini=delta0))
         t = 1.75
-        self.assertAlmostEqual(model.forward(t, 1.8, S0, delta0) * exp(-r*(1.75 - t)),
-                         model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8], S_ini=S0,
-                                    delta_ini=delta0))
+        self.assertAlmostEqual((model.forward(t, 1.8, S0, delta0) - 50) * exp(-r * (1.75 - t)),
+                               model.swap(t=t, exchange_time=[1, 1.5, 1.75], maturities=[1.1, 1.6, 1.8],
+                                          fixed_legs=fixed_legs,
+                                          S_ini=S0, delta_ini=delta0))
 
 
         ########################################
