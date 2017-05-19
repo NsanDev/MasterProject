@@ -103,7 +103,8 @@ This calibrator can be reused for specific + global way risk model
 b: defined in Hull 2012
 Z: Market factor or transformation of Market factor (more generic than value of portfolio)
 probability_default: P(tau<t) for t in times_default. should be calibrated from cds
-times_default: times to define P(tau<t) as a piecewise flat function
+times_default: normaly chosen as times t_i where we have P(tau<t_i) as a piecewise flat function. 
+               but can also be times t_a at which a will be calibrated
 
 return evaluation of piecewise_flat function a in each time in timeline
 '''

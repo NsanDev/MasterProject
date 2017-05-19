@@ -43,7 +43,7 @@ nb_point_exposure = 24
 start_exposure = 0.05
 
 default_extension = '.npy'
-default_folder = '../data/'
+default_folder = 'data/'
 ##############################################################
 ### Constant and functions created from the parameters above.
 ##############################################################
