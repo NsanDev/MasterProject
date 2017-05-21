@@ -10,24 +10,22 @@ Create portfolio with different contracts:
 - swap with exchanged time t_i every M month and delivery M months+t_i with t_i max = T_horizon 
 return list of functions of t,s,delta
 '''
-S0 = 45
-
-# T_M for forward: every month until T_horizon
-T_horizon = 1
-# maturities of option: every month from T_maturity_start until T_horizon
-T_maturity_start = 1 / 2
-# foreach maturity of option, forward with delivery date starting from 1 month later until
-# nb_month_max_option later(included)
-nb_month_max_option = 4
-# Strike +- 6 relative to S0
-strike_option = array([k for k in range(-3, 3 + 1)]) + S0
-# maturity of options
-maturity_option = [0.25, 0.5, 1]
-# delivery time after exercise (have to be indicated in number of month)
-delivery_after_exercise = range(1, 4)
 
 
-def create_contracts(mdl: Schwartz97):
+def create_contracts(mdl: Schwartz97, S0):
+    # T_M for forward: every month until T_horizon
+    T_horizon = 1
+    # maturities of option: every month from T_maturity_start until T_horizon
+    T_maturity_start = 1 / 2
+    # foreach maturity of option, forward with delivery date starting from 1 month later until
+    # nb_month_max_option later(included)
+    nb_month_max_option = 4
+    # Strike +- 6 relative to S0
+    strike_option = array([k for k in range(-3, 3 + 1)]) + S0
+    # maturity of options
+    maturity_option = [0.25, 0.5, 1]
+    # delivery time after exercise (have to be indicated in number of month)
+    delivery_after_exercise = range(1, 4)
 
     book = []
     names_contracts = []

@@ -2,7 +2,7 @@ import time
 
 from numpy import array
 
-from Scripts.parameters import load_model, simulate_path, portfolio, save_array, exposure_function
+from Scripts.parameters import load_model, simulate_path, portfolio, save_array, exposure_function, S0, delta0
 
 start_time = time.clock()
 ###################
@@ -30,9 +30,9 @@ convenience_yield = simulated_paths[1]
 ### Portfolio
 ###################
 
-# cumulated_price = lambda s, t: sum([instrument(s, t) for instrument in portfolio], axis=0)
 contracts_alltimes = array([[instrument(timeline[t], S[t, :], convenience_yield[t, :]) for t in range_timeline]
                             for instrument in book])
+contract_ini = array([instrument(0, S0, delta0) for instrument in book])
 contracts = contracts_alltimes[:, index_exposure, :]
 ###################
 ### Exposure
@@ -47,6 +47,7 @@ save_array('convenience_yields', convenience_yield)
 save_array('contract_names', contract_names)
 save_array('contracts', contracts)
 save_array('exposures', exposures)
+save_array('contract_ini', contract_ini)
 save_array('contracts_alltimes', contracts_alltimes)
 save_array('exposures_alltimes', exposure_alltimes)
 

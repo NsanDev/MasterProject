@@ -102,9 +102,10 @@ class testCreditModel(unittest.TestCase):
         max_iter = 100000
         tol = 1e-7
 
-        a = Calibration_hull(b, Z, timeline, survival_probability, times_default, max_iter, tol)
+        Z_M = b * Z
+        a = Calibration_hull(Z_M, timeline, survival_probability, times_default, max_iter, tol)
 
-        h = a + b * Z
+        h = a + Z_M
         h = exp(h)
         p0 = exp(-h[0] * (timeline[0]))
         p1 = exp(-h[0] * (timeline[0]) - h[1] * (timeline[1] - timeline[0]))
@@ -117,7 +118,7 @@ class testCreditModel(unittest.TestCase):
         self.assertAlmostEqual(mean(p1), survival_probability[1], delta=tol)
         self.assertAlmostEqual(mean(p2), survival_probability[2], delta=tol)
 
-        calculated_weights = Hull(b, Z, timeline, survival_probability, times_default, times_exposure
+        calculated_weights = Hull(Z_M, timeline, survival_probability, times_default, times_exposure
                                   , max_iter=max_iter, tol=tol)
         w1 = (1 - p1) / sum(1 - p1)
         w2 = (p2 - p1) / sum(p2 - p1)

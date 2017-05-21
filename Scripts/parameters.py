@@ -57,7 +57,7 @@ def load_model():
 
 
 def portfolio():
-    book, cashflows_times, contract_name = create_contracts(model)
+    book, cashflows_times, contract_name = create_contracts(model, S0=S0)
     T_horizon_CVA = cashflows_times[-1]
     time_exposure = linspace(min(start_exposure, cashflows_times[0]),
                              T_horizon_CVA, nb_point_exposure, endpoint=True)  # times at which we want exposure

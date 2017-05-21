@@ -110,7 +110,7 @@ return evaluation of piecewise_flat function a in each time in timeline
 '''
 
 
-def Calibration_hull(b, Z, timeline, survival_probability, times_default, max_iter=10000, tol=1e-03):
+def Calibration_hull(Z, timeline, survival_probability, times_default, max_iter=10000, tol=1e-03):
     # TODO add derivative for Newton-Raphson
     assert (timeline[0]>0)
     assert (all(t in timeline for t in times_default))
@@ -124,7 +124,7 @@ def Calibration_hull(b, Z, timeline, survival_probability, times_default, max_it
 
     def f(x):
         a[i_min:i_max] = x
-        return mean(exp(-_integrate_intensity(times_default[0], exp(a + b * Z), timeline))) - survival_probability[0]
+        return mean(exp(-_integrate_intensity(times_default[0], exp(a + Z), timeline))) - survival_probability[0]
 
     a[i_min:i_max] = newton(f, 0, fprime=None, tol=tol, maxiter=max_iter, fprime2=None)
 
@@ -134,7 +134,7 @@ def Calibration_hull(b, Z, timeline, survival_probability, times_default, max_it
 
         def f(x):
             a[i_min:i_max] = x
-            return mean(exp(-_integrate_intensity(times_default[k], exp(a + b * Z), timeline))) - survival_probability[
+            return mean(exp(-_integrate_intensity(times_default[k], exp(a + Z), timeline))) - survival_probability[
                 k]
 
         a[i_min:i_max] = newton(f, 0, fprime=None, tol=tol, maxiter=max_iter, fprime2=None)
@@ -143,13 +143,7 @@ def Calibration_hull(b, Z, timeline, survival_probability, times_default, max_it
 
 
 # TODO: implement generic Hull with multidimensional market factor
-def Hull(b, Z_M, timeline, survival_probability, times_survival, times_exposure, max_iter=10000, tol=1e-3):
-    # assert(len(b) == len(Z_M))
-    Z = zeros(Z_M[0].shape)
-    Z = Z_M
-    # for i in range(0,len(b)):
-    #    Z = Z + b[i]*Z_M[i]
-
-    a = Calibration_hull(b, Z, timeline, survival_probability, times_survival, max_iter=max_iter, tol=tol)
-    hazard_rates = exp(a + b * Z)
+def Hull(Z, timeline, survival_probability, times_survival, times_exposure, max_iter=10000, tol=1e-3):
+    a = Calibration_hull(Z, timeline, survival_probability, times_survival, max_iter=max_iter, tol=tol)
+    hazard_rates = exp(a + Z)
     return Weights(hazard_rates, timeline, times_exposure)
