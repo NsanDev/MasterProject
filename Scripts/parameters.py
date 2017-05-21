@@ -1,5 +1,8 @@
+import glob
+
 from numpy import random, transpose, linspace, array, exp, save, load, maximum
 
+from Common.Constant import eps
 from Scripts.portfolio import create_contracts
 from StochasticProcess.Commodities.Schwartz97 import Schwartz97
 
@@ -25,7 +28,6 @@ Collateral_level = lambda MtM_value: 0  ## No collateral
 ### Parameters for hazard rate
 ##############################
 start_default = 0.1
-nb_point_intensity = 5
 constant_intensity = 0.001  # have to be calibrated from cds
 
 ##############################
@@ -42,6 +44,12 @@ start_path = 0.01
 nb_point_exposure = 24
 start_exposure = 0.05
 
+##############################
+### Finite diff. for greeks
+##############################
+shift = 1E6 * eps  # greeks will be calculated with (f(S+shift)-f(S-shift))/(S*shift)
+
+
 default_extension = '.npy'
 default_folder = 'data/'
 ##############################################################
@@ -50,6 +58,10 @@ default_folder = 'data/'
 
 model = Schwartz97(r=r, sigma_s=sigma_s, kappa=kappa, alpha_tilde=alpha, sigma_e=sigma_e, rho=corr)
 random.seed(seed=seed)
+
+
+def reset():
+    random.seed(seed)
 
 
 def load_model():
@@ -67,12 +79,14 @@ def portfolio():
     return book, time_exposure, timeline, contract_name
 
 
-def simulate_path(timeline):
-    return transpose(model.PathQ(S_ini=S0, delta_ini=delta0, timeline=timeline, nb_path=nb_simulation), (2, 1, 0))
+def simulate_path(timeline, S_ini=S0, delta_ini=delta0, reset_seed=False):
+    if reset_seed:
+        reset()
+    return transpose(model.PathQ(S_ini=S_ini, delta_ini=delta_ini, timeline=timeline, nb_path=nb_simulation), (2, 1, 0))
 
 
-def Q_default(time_exposure):
-    probabilities = exp(-constant_intensity * time_exposure)
+def Q_default(time_exposure, intensity=constant_intensity):
+    probabilities = exp(-intensity * time_exposure)
     probabilities[1:] = probabilities[:-1] - probabilities[1:]
     probabilities[0] = 1 - probabilities[0]
     return probabilities
@@ -96,3 +110,11 @@ def save_array(name, data_array, extension=default_extension, folder=default_fol
 
 def load_array(name, extension=default_extension, folder=default_folder):
     return load(folder + name + extension)
+
+
+def load_all_array(name, folder=default_folder):
+    result = {}
+    mod_folder = folder.replace('/', '')
+    for np_name in glob.glob(folder + name):
+        result[np_name.replace('.npy', '').replace(mod_folder, '').replace('\\', '')] = load(np_name)
+    return result
