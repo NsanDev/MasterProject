@@ -4,17 +4,10 @@ from pandas import DataFrame
 from scipy.stats import t
 from statsmodels.api import OLS  # for regression
 
-from Scripts.parameters import load_array, load_all_array, \
-    bS, bV
+from Scripts.parameters import load_all_array, save_dataframe, bS, bV
 
 cva = load_all_array('cva*')
 delta = load_all_array('delta*')
-# cva_merton = load_array('cva_merton')
-cva_hull = load_array('cva_hull')
-
-
-# plot_surface(X, Y, Z, *args, **kwargs)
-
 
 def alpha_analysis(y, x, parameters, name_parameters, latex_name_parameters, name_fig, CI=True):
     alphas = []
@@ -57,7 +50,7 @@ def alpha_analysis(y, x, parameters, name_parameters, latex_name_parameters, nam
     return df
 
 
-def alpha_analysis_hull(y, x, bS, bV):
+def alpha_analysis_hull(y, x, bS, bV, name_dataframe=''):
     alphas = []
     pvalues = []
     rsquared_adj = []
@@ -85,11 +78,13 @@ def alpha_analysis_hull(y, x, bS, bV):
                     'Standard Error': s,
                     'p-value': pvalues,
                     'R_{adj}': rsquared_adj,
-                    'CI95%_up': CI_up,
-                    'CI95%_low': CI_low})
-    df = df[['b_S', 'b_V', 'alpha', 'Standard Error', 'R_{adj}', 'p-value', 'CI95%_low', 'CI95%_up']]
-    # latex_table = df.to_latex(index=False)
+                    'CI95_up': CI_up,
+                    'CI95_low': CI_low})
+    df = df[['b_S', 'b_V', 'alpha', 'Standard Error', 'R_{adj}', 'p-value', 'CI95_low', 'CI95_up']]
+    if name_dataframe != '':
+        save_dataframe(name_dataframe)
     return df
+
 
 # regression_merton = alpha_analysis(cva_merton, cva_independant, rhos_merton, name_parameters='rho',
 #                                   latex_name_parameters=r'$\rho$', name_fig='alphas_merton')
@@ -97,11 +92,11 @@ def alpha_analysis_hull(y, x, bS, bV):
 # regression_hull = alpha_analysis(cva_hull, cva_independant, bs_hull, name_parameters='b',
 #                                 latex_name_parameters=r'$b$', name_fig='alphas_hull', CI=True)
 
-regression_cva_hull = alpha_analysis_hull(cva['cva_hull'], cva['cva_indep'], bS=bS, bV=bV)
-regression_cva_hull.to_pickle('regression_result/regression_cva_hull.pkl')
-regression_delta_S = alpha_analysis_hull(delta['delta_S_cva_hull'], delta['delta_S_cva_indep'], bS=bS, bV=bV)
-regression_delta_S.to_pickle('regression_result/regression_delta_S.pkl')
+
+regression_cva_hull = alpha_analysis_hull(cva['cva_hull'], cva['cva_indep'], bS=bS, bV=bV,
+                                          name_dataframe='regression_cva_hull')
+regression_delta_S = alpha_analysis_hull(delta['delta_S_cva_hull'], delta['delta_S_cva_indep'], bS=bS, bV=bV,
+                                         name_dataframe='regression_delta_S')
 regression_delta_intensity = alpha_analysis_hull(delta['delta_intensity_cva_hull'], delta['delta_intensity_cva_indep'],
-                                                 bS=bS, bV=bV)
-regression_delta_intensity.to_pickle('regression_result/regression_delta_intensity.pkl')
+                                                 bS=bS, bV=bV, name_dataframe='regression_delta_intensity')
 a = 1

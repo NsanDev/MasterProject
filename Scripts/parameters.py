@@ -1,6 +1,7 @@
 import glob
 
 from numpy import random, transpose, linspace, array, exp, save, load, maximum
+from pandas import read_pickle
 
 from Common.Constant import eps
 from Scripts.portfolio import create_contracts
@@ -60,8 +61,11 @@ start_path = 0.01
 nb_point_exposure = 24
 start_exposure = 0.05
 
-default_extension = '.npy'
-default_folder = 'data/'
+default_extension_array = '.npy'
+default_folder_array = 'data/'
+default_extension_dataframe = '.pkl'
+default_folder_dataframe = 'regression_result/'
+
 ##############################################################
 ### Constant and functions created from the parameters above.
 ##############################################################
@@ -122,17 +126,25 @@ def exposure_function(MtM_value):
     return maximum(MtM_value - Collateral_level(MtM_value), 0)
 
 
-def save_array(name, data_array, extension=default_extension, folder=default_folder):
+def save_array(name, data_array, extension=default_extension_array, folder=default_folder_array):
     save(folder + name + extension, data_array)
 
 
-def load_array(name, extension=default_extension, folder=default_folder):
+def load_array(name, extension=default_extension_array, folder=default_folder_array):
     return load(folder + name + extension)
 
 
-def load_all_array(name, folder=default_folder):
+def load_all_array(name, folder=default_folder_array):
     result = {}
     mod_folder = folder.replace('/', '')
     for np_name in glob.glob(folder + name):
         result[np_name.replace('.npy', '').replace(mod_folder, '').replace('\\', '')] = load(np_name)
     return result
+
+
+def save_dataframe(name, dataframe, folder=default_folder_dataframe):
+    dataframe.to_pickle(folder + name + default_extension_dataframe)
+
+
+def load_dataframe(name, folder=default_folder_dataframe):
+    return read_pickle(folder + name + default_extension_dataframe)
