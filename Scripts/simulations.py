@@ -2,7 +2,7 @@ import time
 
 from numpy import array, abs
 
-from Scripts.parameters import load_model, simulate_path, portfolio, save_array, exposure_function, S0, delta0, shift
+from Scripts.parameters import load_model, simulate_path, portfolio, save_array, exposure_function, S0, delta0, shift_S
 
 
 def launch_simulation(S_ini=S0, delta_ini=delta0, shift_str=''):
@@ -12,7 +12,6 @@ def launch_simulation(S_ini=S0, delta_ini=delta0, shift_str=''):
 
     model = load_model()
     book, time_exposure, timeline, contract_names = portfolio()
-    book = book  # [20:30]
     index_exposure = [list(timeline).index(t) for t in time_exposure]
     range_exposure = range(0, len(time_exposure))
 
@@ -70,7 +69,7 @@ def launch_simulation(S_ini=S0, delta_ini=delta0, shift_str=''):
 
 start_time = time.clock()
 launch_simulation()
-launch_simulation(S_ini=S0 + shift, shift_str='_shift_S_pos')
-launch_simulation(S_ini=S0 - shift, shift_str='_shift_S_neg')
+launch_simulation(S_ini=S0 + shift_S, shift_str='_shift_S_pos')
+launch_simulation(S_ini=S0 - shift_S, shift_str='_shift_S_neg')
 time_perf = time.clock() - start_time
 print(time_perf)

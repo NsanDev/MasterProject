@@ -13,7 +13,7 @@ range_exposure = range(0, len(time_exposure))
 index_exposure = [list(timeline).index(t) for t in time_exposure]
 
 
-def generate_cva_indep(Exposures, Q_default, name_saved_file):
+def generate_cva_indep(Exposures, Q_default, name_saved_file=''):
     PD = Q_default(time_exposure)
     DiscountFactorXdefault = PD * discount_factor(time_exposure)
 
@@ -21,11 +21,13 @@ def generate_cva_indep(Exposures, Q_default, name_saved_file):
     ### Compute cva
     ###################
     resultsDWR = mean(Exposures, axis=2)
-    cva_indep = [sum(resultsDWR[k, :] * DiscountFactorXdefault) for k in range(0, len(Exposures))]
-    save_array(name_saved_file, cva_indep)
+    cva = [sum(resultsDWR[k, :] * DiscountFactorXdefault) for k in range(0, len(Exposures))]
+    if name_saved_file != '':
+        save_array(name_saved_file, cva)
+    return array(cva)
 
 
-def generate_cva_merton(Exposures, Z_M, rhos_merton, Q_default, name_saved_file):
+def generate_cva_merton(Exposures, Z_M, rhos_merton, Q_default, name_saved_file=''):
     PD = Q_default(time_exposure)
     DiscountFactorXdefault = PD * discount_factor(time_exposure)
 
@@ -52,13 +54,16 @@ def generate_cva_merton(Exposures, Z_M, rhos_merton, Q_default, name_saved_file)
             L[r, :] = calc_cva_merton(rhos[r])
         return L
 
-    save_array(name_saved_file, curve_cva(rhos_merton))
+    cva = curve_cva(rhos_merton)
+    if name_saved_file != '':
+        save_array(name_saved_file, cva)
+    return array(cva)
 
     # TODO: finish that cva calculator for different values of rho (Loop).
     # TODO: Think about the cases where rho = 0 or rho = 1
 
 
-def generate_cva_generalized_hull(Exposures, Z_M, Q_default, name_saved_file, max_iter=100000, tol=1e-3):
+def generate_cva_generalized_hull(Exposures, Z_M, Q_default, max_iter=100000, tol=1e-3):
     # need all times for the market factor, not only at exposure
 
     # Calculate the default probabilities at times at which we want to calibrate the 'a's parameters
@@ -84,15 +89,18 @@ def generate_cva_generalized_hull(Exposures, Z_M, Q_default, name_saved_file, ma
     return [sum(resultsDWR[n, :] * DiscountFactorXdefault) for n in range(0, len(Exposures))]
 
 
-def generate_cva_hull(Exposures, Z_M, bs_hull, Q_default, name_saved_file, max_iter=100000, tol=1e-3):
-    cva = [generate_cva_generalized_hull(Exposures, b * Z_M, Q_default, name_saved_file, max_iter=max_iter, tol=tol)
+def generate_cva_hull(Exposures, Z_M, bs_hull, Q_default, name_saved_file='', max_iter=100000, tol=1e-3):
+    cva = [generate_cva_generalized_hull(Exposures, b * Z_M, Q_default, max_iter=max_iter, tol=tol)
            for b in bs_hull]
-    save_array(name_saved_file, cva)
+    if name_saved_file != '':
+        save_array(name_saved_file, cva)
+    return array(cva)
 
 
-def generate_cva_twofactors_hull(Exposures, Z_M1, Z_M2, bs1, bs2, Q_default, name_saved_file, max_iter=100000,
+def generate_cva_twofactors_hull(Exposures, Z_M1, Z_M2, bs1, bs2, Q_default, name_saved_file='', max_iter=100000,
                                  tol=1e-3):
-    cva = [[generate_cva_generalized_hull(Exposures, b1 * Z_M1 + b2 * Z_M2, Q_default, name_saved_file,
-                                          max_iter=max_iter, tol=tol)
+    cva = [[generate_cva_generalized_hull(Exposures, b1 * Z_M1 + b2 * Z_M2, Q_default, max_iter=max_iter, tol=tol)
             for b2 in bs2] for b1 in bs1]
-    save_array(name_saved_file, cva)
+    if name_saved_file != '':
+        save_array(name_saved_file, cva)
+    return array(cva)

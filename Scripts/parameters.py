@@ -7,7 +7,7 @@ from Scripts.portfolio import create_contracts
 from StochasticProcess.Commodities.Schwartz97 import Schwartz97
 
 ##############################
-### Parameters for Schwartz
+### Parameters of Schwartz97
 ##############################
 S0 = 45
 delta0 = 0.15
@@ -20,15 +20,31 @@ lamb = 0.198
 alpha = 0.106 - lamb / kappa
 
 ##############################
-### MC Simulation
+### Collateral model
 ##############################
 Collateral_level = lambda MtM_value: 0  ## No collateral
 
 ##############################
 ### Parameters for hazard rate
 ##############################
-start_default = 0.1
 constant_intensity = 0.001  # have to be calibrated from cds
+
+##############################
+### Parameters of weights simulations
+##############################
+# Merton
+nb_rho_merton = 3
+rhos_merton = [k / (nb_rho_merton + 1) for k in range(-nb_rho_merton, nb_rho_merton + 1)]
+
+# Hull
+bS = linspace(start=-0.1, stop=0.1, num=3, endpoint=True)
+bV = linspace(start=-0.1, stop=0.1, num=3, endpoint=True)
+
+##############################
+### Finite diff. for greeks/sensitivity
+##############################
+shift_S = 1E6 * eps  # sensi. of cva will be calculated with f(S_ini+shift_S)-f(S_ini-shift_S))/(2*shift_S)
+shift_intensity = 1E6 * eps  # sensi. will be calculated with f(intensity+shift)-f(intensity-shift))/(2*shift_intensity)
 
 ##############################
 ### MC Simulation
@@ -43,12 +59,6 @@ start_path = 0.01
 # Times where exposure will be calculated
 nb_point_exposure = 24
 start_exposure = 0.05
-
-##############################
-### Finite diff. for greeks
-##############################
-shift = 1E6 * eps  # greeks will be calculated with (f(S+shift)-f(S-shift))/(S*shift)
-
 
 default_extension = '.npy'
 default_folder = 'data/'
@@ -85,11 +95,19 @@ def simulate_path(timeline, S_ini=S0, delta_ini=delta0, reset_seed=False):
     return transpose(model.PathQ(S_ini=S_ini, delta_ini=delta_ini, timeline=timeline, nb_path=nb_simulation), (2, 1, 0))
 
 
-def Q_default(time_exposure, intensity=constant_intensity):
-    probabilities = exp(-intensity * time_exposure)
+def Q_default(times, intensity=constant_intensity):
+    probabilities = exp(-intensity * times)
     probabilities[1:] = probabilities[:-1] - probabilities[1:]
     probabilities[0] = 1 - probabilities[0]
     return probabilities
+
+
+def Q_default_shift_pos(times):
+    return Q_default(times=times, intensity=constant_intensity + shift_intensity)
+
+
+def Q_default_shift_neg(times):
+    return Q_default(times=times, intensity=constant_intensity - shift_intensity)
 
 
 def cumulated_Q_survival(time_exposure):
