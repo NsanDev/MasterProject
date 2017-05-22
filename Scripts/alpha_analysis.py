@@ -9,6 +9,7 @@ from Scripts.parameters import load_all_array, save_dataframe, bS, bV
 cva = load_all_array('cva*')
 delta = load_all_array('delta*')
 
+
 def alpha_analysis(y, x, parameters, name_parameters, latex_name_parameters, name_fig, CI=True):
     alphas = []
     pvalues = []
@@ -82,7 +83,7 @@ def alpha_analysis_hull(y, x, bS, bV, name_dataframe=''):
                     'CI95_low': CI_low})
     df = df[['b_S', 'b_V', 'alpha', 'Standard Error', 'R_{adj}', 'p-value', 'CI95_low', 'CI95_up']]
     if name_dataframe != '':
-        save_dataframe(name_dataframe)
+        save_dataframe(name_dataframe, df)
     return df
 
 
@@ -97,6 +98,8 @@ regression_cva_hull = alpha_analysis_hull(cva['cva_hull'], cva['cva_indep'], bS=
                                           name_dataframe='regression_cva_hull')
 regression_delta_S = alpha_analysis_hull(delta['delta_S_cva_hull'], delta['delta_S_cva_indep'], bS=bS, bV=bV,
                                          name_dataframe='regression_delta_S')
+
 regression_delta_intensity = alpha_analysis_hull(delta['delta_intensity_cva_hull'], delta['delta_intensity_cva_indep'],
                                                  bS=bS, bV=bV, name_dataframe='regression_delta_intensity')
+
 a = 1

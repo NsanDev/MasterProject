@@ -69,3 +69,4 @@ delta_intensity_cva_hull = (cva_hull_shift_intensity_pos - cva_hull_shift_intens
 save_array('delta_intensity_cva_hull', delta_intensity_cva_hull)
 
 a = 1
+# TODO: add common tolerance and max iter for newton raphson

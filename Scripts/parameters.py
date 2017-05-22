@@ -39,7 +39,7 @@ rhos_merton = [k / (nb_rho_merton + 1) for k in range(-nb_rho_merton, nb_rho_mer
 
 # Hull
 bS = linspace(start=-0.1, stop=0.1, num=3, endpoint=True)
-bV = linspace(start=-0.1, stop=0.1, num=3, endpoint=True)
+bV = linspace(start=-0.1, stop=0.1, num=5, endpoint=True)
 
 ##############################
 ### Finite diff. for greeks/sensitivity
@@ -61,10 +61,22 @@ start_path = 0.01
 nb_point_exposure = 24
 start_exposure = 0.05
 
+##############################
+### Newton Raphson (calibration) for now, this is actually secant method because fprime is not precised
+##############################
+max_iter_NR = 1000000
+tol_NR = 1e-3
+
+##############################
+### Save data and figure
+##############################
+
 default_extension_array = '.npy'
 default_folder_array = 'data/'
 default_extension_dataframe = '.pkl'
 default_folder_dataframe = 'regression_result/'
+default_extension_fig = '.png'
+default_folder_fig = 'pictures/'
 
 ##############################################################
 ### Constant and functions created from the parameters above.
@@ -138,7 +150,7 @@ def load_all_array(name, folder=default_folder_array):
     result = {}
     mod_folder = folder.replace('/', '')
     for np_name in glob.glob(folder + name):
-        result[np_name.replace('.npy', '').replace(mod_folder, '').replace('\\', '')] = load(np_name)
+        result[np_name.replace(default_extension_array, '').replace(mod_folder, '').replace('\\', '')] = load(np_name)
     return result
 
 
@@ -148,3 +160,17 @@ def save_dataframe(name, dataframe, folder=default_folder_dataframe):
 
 def load_dataframe(name, folder=default_folder_dataframe):
     return read_pickle(folder + name + default_extension_dataframe)
+
+
+def load_all_dataframe(name, folder=default_folder_dataframe):
+    result = {}
+    mod_folder = folder.replace('/', '')
+    for np_name in glob.glob(folder + name):
+        result[np_name.replace(default_extension_dataframe, '')
+            .replace(mod_folder, '')
+            .replace('\\', '')] = load(np_name)
+    return result
+
+
+def save_figure(name, figure, folder=default_folder_fig):
+    figure.savefig(default_folder_fig + name + default_extension_fig)
