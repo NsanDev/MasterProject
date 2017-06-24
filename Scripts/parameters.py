@@ -4,7 +4,7 @@ from numpy import random, transpose, linspace, array, exp, save, load, maximum
 from pandas import read_pickle
 
 from Common.Constant import eps
-from Scripts.portfolio import create_contracts
+from Scripts.data_generators.portfolio import create_contracts
 from StochasticProcess.Commodities.Schwartz97 import Schwartz97
 
 ##############################
@@ -38,8 +38,8 @@ nb_rho_merton = 3
 rhos_merton = [k / (nb_rho_merton + 1) for k in range(-nb_rho_merton, nb_rho_merton + 1)]
 
 # Hull
-bS = linspace(start=-0.1, stop=0.1, num=3, endpoint=True)
-bV = linspace(start=-0.1, stop=0.1, num=5, endpoint=True)
+bS = linspace(start=-0.5, stop=0.5, num=11, endpoint=True)
+bV = bS
 
 ##############################
 ### Finite diff. for greeks/sensitivity
@@ -54,12 +54,12 @@ nb_simulation = 1000
 seed = 124
 
 # time discretization of path
-nb_point_path = 20
+nb_point_path = 10
 start_path = 0.01
 
 # Times where exposure will be calculated
-nb_point_exposure = 24
-start_exposure = 0.05
+nb_point_exposure = nb_point_path
+start_exposure = start_path
 
 ##############################
 ### Newton Raphson (calibration) for now, this is actually secant method because fprime is not precised

@@ -6,9 +6,6 @@ from statsmodels.api import OLS  # for regression
 
 from Scripts.parameters import load_all_array, save_dataframe, bS, bV
 
-cva = load_all_array('cva*')
-delta = load_all_array('delta*')
-
 
 def alpha_analysis(y, x, parameters, name_parameters, latex_name_parameters, name_fig, CI=True):
     alphas = []
@@ -87,19 +84,21 @@ def alpha_analysis_hull(y, x, bS, bV, name_dataframe=''):
     return df
 
 
-# regression_merton = alpha_analysis(cva_merton, cva_independant, rhos_merton, name_parameters='rho',
-#                                   latex_name_parameters=r'$\rho$', name_fig='alphas_merton')
+if __name__ == '__main__':
+    cva = load_all_array('cva*')
+    delta = load_all_array('delta*')
+    # regression_merton = alpha_analysis(cva_merton, cva_independant, rhos_merton, name_parameters='rho',
+    #                                   latex_name_parameters=r'$\rho$', name_fig='alphas_merton')
 
-# regression_hull = alpha_analysis(cva_hull, cva_independant, bs_hull, name_parameters='b',
-#                                 latex_name_parameters=r'$b$', name_fig='alphas_hull', CI=True)
+    # regression_hull = alpha_analysis(cva_hull, cva_independant, bs_hull, name_parameters='b',
+    #                                 latex_name_parameters=r'$b$', name_fig='alphas_hull', CI=True)
 
 
-regression_cva_hull = alpha_analysis_hull(cva['cva_hull'], cva['cva_indep'], bS=bS, bV=bV,
-                                          name_dataframe='regression_cva_hull')
-regression_delta_S = alpha_analysis_hull(delta['delta_S_cva_hull'], delta['delta_S_cva_indep'], bS=bS, bV=bV,
-                                         name_dataframe='regression_delta_S')
+    regression_cva_hull = alpha_analysis_hull(cva['cva_hull'], cva['cva_indep'], bS=bS, bV=bV,
+                                              name_dataframe='regression_cva_hull')
+    regression_delta_S = alpha_analysis_hull(delta['delta_S_cva_hull'], delta['delta_S_cva_indep'], bS=bS, bV=bV,
+                                             name_dataframe='regression_delta_S')
 
-regression_delta_intensity = alpha_analysis_hull(delta['delta_intensity_cva_hull'], delta['delta_intensity_cva_indep'],
-                                                 bS=bS, bV=bV, name_dataframe='regression_delta_intensity')
-
-a = 1
+    regression_delta_intensity = alpha_analysis_hull(delta['delta_intensity_cva_hull'],
+                                                     delta['delta_intensity_cva_indep'],
+                                                     bS=bS, bV=bV, name_dataframe='regression_delta_intensity')

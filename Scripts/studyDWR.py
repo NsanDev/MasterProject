@@ -12,7 +12,7 @@ from xlrd.formula import num2strg
 from CreditModel.DirectionalWayRisk.Weights import Merton
 from CreditModel.Tools.RiskStatistics import risk_statistics
 from Maths.ClosedForm.BlackScholes import Call, Put
-from Maths.PiecewiseFlat import piecewise_flat
+from Maths.Interpolation.PiecewiseFlat import piecewise_flat
 from StochasticProcess.GeometricBrownianMotion import GeometricBrownianMotion
 
 if __name__ == '__main__':

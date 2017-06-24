@@ -10,7 +10,7 @@ from numpy import transpose, sum, array, linspace, random, maximum
 
 from CreditModel.DirectionalWayRisk.Weights import Merton, Probabilities_CVA
 from CreditModel.Tools.RiskStatistics import risk_statistics
-from Scripts.portfolio import create_contracts
+from Scripts.data_generators.portfolio import create_contracts
 from StochasticProcess.Commodities.Schwartz97 import Schwartz97
 
 if __name__ == '__main__':
@@ -45,7 +45,7 @@ start_exposure = 0.05
 start_default = 0.1
 start_path = 0.01
 
-book, name_contracts, time_exposure1 = create_contracts(mdl=model, S_ini=S0)
+book, name_contracts, time_exposure1 = create_contracts(mdl=model, S0=S0)
 book = book  # [20:30]
 
 T_horizon_CVA = max(time_exposure1)

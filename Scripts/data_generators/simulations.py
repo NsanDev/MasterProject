@@ -1,8 +1,6 @@
-import time
-
 from numpy import array, abs
 
-from Scripts.parameters import load_model, simulate_path, portfolio, save_array, exposure_function, S0, delta0, shift_S
+from Scripts.parameters import load_model, simulate_path, portfolio, save_array, exposure_function, S0, delta0
 
 
 def launch_simulation(S_ini=S0, delta_ini=delta0, shift_str=''):
@@ -65,11 +63,3 @@ def launch_simulation(S_ini=S0, delta_ini=delta0, shift_str=''):
     save_array('timeline', timeline)
     save_array('time_exposure', time_exposure)
     save_array('contract_names', contract_names)
-
-
-start_time = time.clock()
-launch_simulation()
-launch_simulation(S_ini=S0 + shift_S, shift_str='_shift_S_pos')
-launch_simulation(S_ini=S0 - shift_S, shift_str='_shift_S_neg')
-time_perf = time.clock() - start_time
-print(time_perf)
