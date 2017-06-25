@@ -2,6 +2,7 @@ from matplotlib import cm
 from matplotlib.pyplot import subplots, figure, legend
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from numpy import meshgrid
+from mpl_toolkits.mplot3d import Axes3D
 
 from Scripts.parameters import save_figure, load_all_dataframe
 
