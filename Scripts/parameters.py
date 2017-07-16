@@ -11,14 +11,14 @@ from StochasticProcess.Commodities.Schwartz97 import Schwartz97
 ### Parameters of Schwartz97
 ##############################
 S0 = 45
-delta0 = 0.15
-r = 0.1
+delta0 = -0.2  # 0.15
+r = 0.01
 sigma_s = 0.393
 kappa = 1.876
 sigma_e = 0.527
 corr = 0.766
 lamb = 0.198
-alpha = 0.106 - lamb / kappa
+alpha = -0.05  #0.106 - lamb / kappa # risk neutral alpha
 
 ##############################
 ### Collateral model
@@ -105,10 +105,10 @@ def portfolio():
     return book, time_exposure, timeline, contract_name
 
 
-def simulate_path(timeline, S_ini=S0, delta_ini=delta0, reset_seed=False):
+def simulate_path(timeline, S_ini=S0, delta_ini=delta0, reset_seed=False, nb_path=nb_simulation):
     if reset_seed:
         reset()
-    return transpose(model.PathQ(S_ini=S_ini, delta_ini=delta_ini, timeline=timeline, nb_path=nb_simulation), (2, 1, 0))
+    return transpose(model.PathQ(S_ini=S_ini, delta_ini=delta_ini, timeline=timeline, nb_path=nb_path), (2, 1, 0))
 
 
 def Q_default(times, intensity=constant_intensity):

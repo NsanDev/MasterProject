@@ -64,7 +64,7 @@ def alpha_analysis_hull(y, x, bS, bV, name_dataframe=''):
             alphas.append(*fitted.params)
             pvalues.append(*fitted.pvalues)
             rsquared_adj.append(fitted.rsquared_adj)
-            s.append(fitted.cov_HC0[0, 0])
+            s.append(fitted.HC0_se[0])
             duplicate_b_S.append(bS[k])
             duplicate_b_V.append(bV[l])
     s = array(s)

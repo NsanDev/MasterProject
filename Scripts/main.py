@@ -35,9 +35,9 @@ if __name__ == '__main__':
 
     # Plot directly saved
     regression = load_all_dataframe('regression*')
-    surface_hull(regression['regression_cva_hull'], 'cva_hull', (15, -135))
-    surface_hull(regression['regression_delta_S'], 'regression_delta_S', (15, -135))
-    surface_hull(regression['regression_delta_intensity'], 'regression_delta_intensity', (15, -135))
+    surface_hull(regression['regression_cva_hull'], 'cva_hull', (15, -160))
+    surface_hull(regression['regression_delta_S'], 'regression_delta_S', (15, -20))
+    surface_hull(regression['regression_delta_intensity'], 'regression_delta_intensity', (15, -160))
     plot_hull(regression['regression_cva_hull'], 'cva_hull')
     plot_hull(regression['regression_delta_S'], 'regression_delta_S')
     plot_hull(regression['regression_delta_intensity'], 'regression_delta_intensity')

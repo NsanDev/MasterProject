@@ -34,7 +34,6 @@ def launch_simulation(S_ini=S0, delta_ini=delta0, shift_str=''):
                                 for instrument in book])
     contract_ini = array([instrument(0, S_ini, delta_ini) for instrument in book])
     contracts = contracts_alltimes[:, index_exposure, :]
-
     ###################
     ### Exposure
     ###################

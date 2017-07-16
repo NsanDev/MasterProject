@@ -138,11 +138,9 @@ def Calibration_hull(Z, timeline, survival_probability, times_default, max_iter=
                 k]
 
         a[i_min:i_max] = newton(f, 0, fprime=None, tol=tol, maxiter=max_iter, fprime2=None)
-    # TODO test that
     return a
 
 
-# TODO: implement generic Hull with multidimensional market factor
 def Hull(Z, timeline, survival_probability, times_survival, times_exposure, max_iter=10000, tol=1e-3):
     a = Calibration_hull(Z, timeline, survival_probability, times_survival, max_iter=max_iter, tol=tol)
     hazard_rates = exp(a + Z)
