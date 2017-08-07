@@ -40,7 +40,7 @@ def create_contracts(mdl: Schwartz97, S0):
     cashflow_times = set(time_forward)
     for T_M in time_forward:
         book.append(lambda t, s, delta, T_M=T_M: mdl.forward(t=t, T=T_M, S_ini=s, delta_ini=delta))
-        names_contracts.append("Forward $T_M$=" + str(T_M))
+        names_contracts.append("Forward $T_d$=" + str(T_M))
 
     #####################
     ### call put
@@ -59,9 +59,9 @@ def create_contracts(mdl: Schwartz97, S0):
                             mdl.put(t, maturity_option=T, delivery_time_forward=T + k / 12,
                                     K=K, S_ini=s, delta_ini=delta))
                 names_contracts.append("Call T=" + str(T) + ", K="
-                                       + str(K) + ", T_M=T+" + str(k) + "Months")
+                                       + str(K) + ", $T_d$=T+" + str(k) + "Months")
                 names_contracts.append("Put T=" + str(T) + ", K="
-                                       + str(K) + ", T_M=T+" + str(k) + "Months")
+                                       + str(K) + ", $T_d$=T+" + str(k) + "Months")
 
     #####################
     ### Swap
@@ -74,7 +74,7 @@ def create_contracts(mdl: Schwartz97, S0):
                     : mdl.swap(t=t, exchange_time=exchange_time, maturities=time_delivery,
                                fixed_legs=fixed_leg * ones(len(exchange_time)), S_ini=s, delta_ini=delta))
         names_contracts.append(
-            str(periodicity) + "-Months Swap T=" + str(maturity_option) + " K=" + str(fixed_leg / S0) + "S0", )
+            "Swap" + " K=" + str(fixed_leg / S0) + "$S_0$" + " Periodicity=" + str(periodicity) + " Months", )
         return cft
 
     periodicities = [3, 4, 6, 12]

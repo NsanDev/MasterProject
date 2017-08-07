@@ -22,7 +22,7 @@ if __name__ == '__main__':
     T_horizon = 1
     b_S = [-0.5, -0.5, 0, 0.5]
     b_V = [0, 0.5, 0.5, 0.5]
-    time_obs_exp = 0.25
+    time_obs_exp = 0.75
 
     #####################
     ### Create books
@@ -157,14 +157,14 @@ if __name__ == '__main__':
         for j in range_book:
             axes[j, 0].set_ylabel(contract_name_short[j], fontweight='bold', fontsize=12)
 
-        red_patch = mpatches.Patch(color='red', label='DRW')
+        red_patch = mpatches.Patch(color='red', label='DWR')
         blue_patch = mpatches.Patch(color='blue', label='Indep.')
         ee_patch = mlines.Line2D([], [], color='black', label='', ls='-')
         pfe_patch = mlines.Line2D([], [], color='black', label=r'PFE_0.5', ls='-.')
         es_patch = mlines.Line2D([], [], color='black', label=r'ES_0.5', ls=':')
 
         f.legend(handles=[blue_patch, red_patch, ee_patch, pfe_patch, es_patch]
-                 , labels=['DRW', 'Indep.', 'EE', r'$PFE_{0.5}$', r'$ES_{0.5}$']
+                 , labels=['Indep.', 'DWR', 'EE', r'$PFE_{0.5}$', r'$ES_{0.5}$']
                  , ncol=5, loc='lower center', fontsize=14)
         title = r"$b_S$ = {} , $b_V$ = {}".format(str(bs), str(bv))
 
