@@ -1,9 +1,12 @@
-# Getting started
+# DWR with weights approach 
+This code has been written for my master's thesis. It contains an implementation of the Schwarz (1997) model and some class for introducing Directional Way Risk in the calculation of exposure's statistics.
 
-## Installation
+## Getting started
+
+### Installation
 Just install python 3.6 with the standard packages from [Anaconda3](https://www.continuum.io/downloads)
 
-## A few words on the structure of the project
+### A few words on the structure of the project
 
 The *Scripts* folder contains the code that generates graphs and tables. 
 * In particular, *parameters.py* contains all the constants for the models and the parameters of the simulations. 
