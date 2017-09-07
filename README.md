@@ -4,7 +4,12 @@ This code has been written for my master's thesis. It contains an implementation
 ## Getting started
 
 ### Installation
-Just install python 3.6 with the standard packages from [Anaconda3](https://www.continuum.io/downloads)
+Just install python 3.6 with the standard packages from [Anaconda3](https://www.continuum.io/downloads). Here are some packages to add in your environment:
+* numba
+* statsmodel
+* joblib
+
+Running it on [PyCharm 2017.2.3 Community Edition](https://www.jetbrains.com/pycharm/download/) should make it work out of the box. I met some issues when I tried to run it in VSCode.
 
 ### A few words on the structure of the project
 
